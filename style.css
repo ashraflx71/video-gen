@@ -1,100 +1,103 @@
-/* إعدادات الصفحة الأساسية */
-body {
-    background-color: #000000; /* أسود خالص */
-    color: #ffffff;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 0;
-    padding: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محرك فيديو Creative 2026 - المطور</title>
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --black: #000000;
+            --dark-gray: #1a1a1a;
+        }
+        body {
+            background-color: var(--black);
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+        h2 {
+            color: var(--gold);
+            font-size: 28px;
+            border-bottom: 2px solid var(--gold);
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        label {
+            display: block;
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: #e0e0e0;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            background-color: var(--dark-gray);
+            border: 2px solid var(--gold);
+            border-radius: 10px;
+            color: white;
+            padding: 15px;
+            font-size: 20px;
+            box-sizing: border-box;
+            margin-bottom: 25px;
+        }
+        button {
+            background: linear-gradient(45deg, #B8860B, #D4AF37);
+            color: black;
+            border: none;
+            padding: 15px 30px;
+            font-size: 22px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+            transition: 0.3s;
+        }
+        button:active {
+            transform: scale(0.95);
+        }
+        footer {
+            margin-top: 40px;
+            font-size: 16px;
+            color: var(--gold);
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
 
-.container {
-    width: 100%;
-    max-width: 500px;
-    text-align: center;
-}
+<div class="container">
+    <h2>محرك فيديو Creative 2026</h2>
+    
+    <label for="videoText">النص المراد تحويله لفيديو:</label>
+    <textarea id="videoText" placeholder="اكتب النص هنا..."></textarea>
 
-/* صندوق المعاينة (Canvas) */
-.video-preview-wrapper {
-    background: #1a1a1a;
-    border: 2px solid #D4AF37; /* إطار ذهبي */
-    border-radius: 15px;
-    overflow: hidden;
-    margin-bottom: 25px;
-    box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2);
-}
+    <button onclick="generateVideo()">🎬 توليد وتحميل الفيديو</button>
+    
+    <footer>تطوير: أشرف حسن علي - 2026</footer>
+</div>
 
-canvas {
-    width: 100%; /* ليتناسب مع شاشة الموبايل */
-    height: auto;
-    display: block;
-}
+<script>
+    function generateVideo() {
+        const text = document.getElementById('videoText').value;
+        if(!text) {
+            alert("يرجى إدخال النص أولاً");
+            return;
+        }
+        // هنا يتم ربط أوامر البايثون أو مكتبة التوليد الخاصة بك
+        console.log("جاري معالجة النص: " + text);
+    }
+</script>
 
-/* بطاقة التحكم */
-.controls-card {
-    background: #111111;
-    padding: 25px;
-    border-radius: 20px;
-    border-top: 4px solid #D4AF37;
-}
-
-.title {
-    color: #D4AF37;
-    font-size: 26px;
-    margin-bottom: 20px;
-}
-
-/* تحسين المدخلات والنصوص (أكبر من 20px) */
-.input-group label {
-    display: block;
-    margin-bottom: 10px;
-    font-size: 20px;
-    color: #e0e0e0;
-}
-
-input[type="text"] {
-    width: 100%;
-    padding: 15px;
-    font-size: 22px; /* خط كبير لسهولة الكتابة */
-    background: #222;
-    border: 1px solid #444;
-    border-radius: 10px;
-    color: #D4AF37;
-    box-sizing: border-box;
-    margin-bottom: 25px;
-    text-align: center;
-}
-
-input[type="text"]:focus {
-    outline: none;
-    border-color: #D4AF37;
-    background: #2a2a2a;
-}
-
-/* الزر الذهبي الفاخر */
-.btn-gold {
-    background: linear-gradient(45deg, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
-    color: #000;
-    border: none;
-    padding: 18px 30px;
-    font-size: 22px;
-    font-weight: bold;
-    border-radius: 50px;
-    cursor: pointer;
-    width: 100%;
-    transition: transform 0.2s;
-    box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
-}
-
-.btn-gold:active {
-    transform: scale(0.98);
-}
-
-.status-note {
-    font-size: 16px;
-    color: #888;
-    margin-top: 15px;
-}
+</body>
+</html>
