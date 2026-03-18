@@ -3,157 +3,185 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creative 2026 | محرر الفيديو الاحترافي</title>
+    <title>Creative 2026 | محرر الفيديو الذهبي</title>
     <style>
-        /* تصميم أشرف المفضل: أسود وذهبي */
+        /* تصميم مريح للعين - أسود وذهبي */
         body {
-            background-color: #000;
-            color: #fff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size: 22px; /* خط كبير لسهولة القراءة من الهاتف */
+            background-color: #000000;
+            color: #FFFFFF;
+            font-family: Arial, sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 15px;
             text-align: center;
         }
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
+        h1 {
+            color: #D4AF37; /* ذهبي */
+            font-size: 35px;
+            margin-bottom: 20px;
         }
 
-        h1 { color: #D4AF37; margin-bottom: 30px; }
-
-        #editor-container {
-            position: relative;
-            margin-bottom: 20px;
-            border: 2px solid #D4AF37;
+        /* حاوية الفيديو */
+        #video-wrapper {
+            border: 3px solid #D4AF37;
             background: #111;
-            line-height: 0;
+            margin-bottom: 20px;
+            overflow: hidden;
+            border-radius: 10px;
         }
 
         canvas {
-            max-width: 100%;
+            width: 100%;
             height: auto;
+            display: block;
         }
 
-        input, select {
-            width: 90%;
-            padding: 15px;
+        /* المدخلات والأزرار بحجم كبير جداً */
+        input {
+            width: 95%;
+            padding: 20px;
+            font-size: 22px;
             margin: 10px 0;
-            border-radius: 8px;
-            border: 1px solid #D4AF37;
             background: #222;
             color: #fff;
-            font-size: 20px;
+            border: 2px solid #444;
+            border-radius: 10px;
+        }
+
+        input:focus {
+            border-color: #D4AF37;
+            outline: none;
         }
 
         .button {
+            width: 95%;
+            padding: 22px;
+            font-size: 24px;
+            font-weight: bold;
             background-color: #D4AF37;
             color: #000;
-            padding: 15px 30px;
             border: none;
-            border-radius: 8px;
-            font-size: 22px;
-            font-weight: bold;
+            border-radius: 10px;
             cursor: pointer;
-            width: 90%;
             margin-top: 10px;
         }
 
-        .button:active { transform: scale(0.98); }
-        
-        #videoInfo { margin-top: 20px; color: #D4AF37; font-weight: bold; }
+        .button-secondary {
+            background-color: #333;
+            color: #D4AF37;
+            border: 1px solid #D4AF37;
+        }
+
+        #status-msg {
+            font-size: 20px;
+            color: #D4AF37;
+            margin-top: 15px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
     <h1>Creative 2026</h1>
 
-    <div id="editor-container">
-        <canvas id="videoCanvas" width="1280" height="720"></canvas>
+    <div id="video-wrapper">
+        <canvas id="mainCanvas" width="1280" height="720"></canvas>
     </div>
 
     <div class="controls">
-        <input type="text" id="youtubeUrl" placeholder="الصق رابط الفيديو هنا...">
-        <button id="fetchBtn" class="button">🔍 جلب ومعالجة الفيديو</button>
+        <input type="text" id="videoUrl" placeholder="الصق رابط فيديو يوتيوب هنا">
+        <button class="button" onclick="startApp()">🔍 جلب ومعالجة الفيديو</button>
         
-        <hr style="border: 0.5px solid #333; margin: 20px 0;">
+        <input type="text" id="userText" placeholder="اكتب النص الذهبي الذي سيظهر">
+        <button class="button button-secondary" onclick="updateOverlay()">✍️ تحديث النص السينمائي</button>
         
-        <input type="text" id="overlayText" placeholder="اكتب النص الذهبي هنا...">
-        <button id="applyTextBtn" class="button">✍️ إضافة النص السينمائي</button>
+        <button id="saveBtn" class="button" style="background-color: #28a745; color: white; display:none;" onclick="recordVideo()">💾 حفظ الفيديو النهائي</button>
     </div>
 
-    <div id="videoInfo"></div>
-</div>
+    <p id="status-msg">جاهز لبدء مشروعك الجديد...</p>
 
-<script>
-    // كود المحرر الذكي
-    class VideoEditor {
-        constructor() {
-            this.canvas = document.getElementById('videoCanvas');
-            this.ctx = this.canvas.getContext('2d');
-            this.video = document.createElement('video');
-            this.video.crossOrigin = "anonymous";
-            this.text = "Creative 2026";
-            
-            this.setupEvents();
-            this.draw();
-        }
+    <script>
+        const canvas = document.getElementById('mainCanvas');
+        const ctx = canvas.getContext('2d');
+        const video = document.createElement('video');
+        video.crossOrigin = "anonymous";
+        
+        let overlayText = "Creative 2026";
 
-        setupEvents() {
-            // زر الجلب (محاكاة للجلب تمهيداً لربط الـ API الخاص بك)
-            document.getElementById('fetchBtn').onclick = () => {
-                const url = document.getElementById('youtubeUrl').value;
-                if(url) {
-                    document.getElementById('videoInfo').innerText = "⏳ جاري تهيئة المحرك...";
-                    // سنستخدم فيديو تجريبي حالياً للتأكد من عمل المحرر
-                    this.loadVideo("https://www.w3schools.com/html/mov_bbb.mp4");
-                }
-            };
+        // وظيفة تشغيل التطبيق والجلب
+        function startApp() {
+            const url = document.getElementById('videoUrl').value;
+            const status = document.getElementById('status-msg');
 
-            // زر إضافة النص
-            document.getElementById('applyTextBtn').onclick = () => {
-                this.text = document.getElementById('overlayText').value;
-            };
-        }
-
-        loadVideo(url) {
-            this.video.src = url;
-            this.video.loop = true;
-            this.video.play();
-            document.getElementById('videoInfo').innerText = "✅ الفيديو جاهز للتعديل";
-        }
-
-        draw() {
-            // رسم الفيديو
-            this.ctx.drawImage(this.video, 0, 0, this.canvas.width, this.canvas.height);
-
-            // إضافة الفلتر السينمائي (تعتيم خفيف)
-            this.ctx.fillStyle = "rgba(0,0,0,0.2)";
-            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-            // إضافة النص الذهبي
-            if (this.text) {
-                this.ctx.font = "bold 60px 'Segoe UI'";
-                let gradient = this.ctx.createLinearGradient(0, 400, 0, 720);
-                gradient.addColorStop(0, "#D4AF37");
-                gradient.addColorStop(1, "#FFD700");
-
-                this.ctx.fillStyle = gradient;
-                this.ctx.textAlign = "center";
-                this.ctx.shadowColor = "black";
-                this.ctx.shadowBlur = 15;
-                this.ctx.fillText(this.text, this.canvas.width/2, 650);
+            if (!url) {
+                alert("من فضلك ضع رابط الفيديو");
+                return;
             }
 
-            requestAnimationFrame(() => this.draw());
+            status.innerText = "⏳ جاري محاكاة الربط وتجهيز المحرك...";
+            
+            // رابط فيديو تجريبي ليعمل معك فوراً حتى نربط الـ API
+            video.src = "https://www.w3schools.com/html/mov_bbb.mp4";
+            video.loop = true;
+            video.play();
+
+            video.onplay = () => {
+                status.innerText = "✅ الفيديو يعمل! يمكنك إضافة النص وحفظ العمل.";
+                document.getElementById('saveBtn').style.display = "block";
+                draw();
+            };
         }
-    }
 
-    // تشغيل المحرر عند فتح الصفحة من الهاتف
-    window.onload = () => new VideoEditor();
-</script>
+        // تحديث النص من المدخلات
+        function updateOverlay() {
+            overlayText = document.getElementById('userText').value || "Creative 2026";
+        }
 
+        // عملية الرسم المستمرة (الفيديو + الفلتر + النص)
+        function draw() {
+            if (!video.paused && !video.ended) {
+                // 1. رسم الفيديو
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                // 2. إضافة فلتر تعتيم خفيف ليبرز النص
+                ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // 3. رسم النص الذهبي الفخم
+                ctx.font = "bold 70px Arial";
+                let goldGrad = ctx.createLinearGradient(0, 500, 0, 700);
+                goldGrad.addColorStop(0, "#D4AF37");
+                goldGrad.addColorStop(1, "#FFD700");
+
+                ctx.fillStyle = goldGrad;
+                ctx.textAlign = "center";
+                ctx.shadowColor = "black";
+                ctx.shadowBlur = 20;
+                ctx.fillText(overlayText, canvas.width / 2, 650);
+            }
+            requestAnimationFrame(draw);
+        }
+
+        // وظيفة تسجيل الفيديو وحفظه على هاتفك
+        function recordVideo() {
+            const stream = canvas.captureStream(30);
+            const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+            const chunks = [];
+
+            recorder.ondataavailable = e => chunks.push(e.data);
+            recorder.onstop = () => {
+                const blob = new Blob(chunks, { type: 'video/webm' });
+                const downloadUrl = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = downloadUrl;
+                a.download = 'Creative_2026_Pro.webm';
+                a.click();
+            };
+
+            recorder.start();
+            alert("بدأ التسجيل (10 ثوانٍ).. انتظر قليلاً");
+            setTimeout(() => recorder.stop(), 10000);
+        }
+    </script>
 </body>
 </html>
