@@ -32,7 +32,67 @@
         <main class="app-main">
             <!-- Input Section -->
             <section class="input-section">
-                <h2>إعدادات الفيديو</h2>
+                <h2>إعدادات الفيديو</h2><!-- YouTube Download Section -->
+<section class="youtube-section">
+    <h2>📥 تحميل من YouTube</h2>
+    
+    <div class="form-group">
+        <label for="youtubeUrl">رابط الفيديو:</label>
+        <div class="youtube-input-group">
+            <input type="url" id="youtubeUrl" placeholder="https://www.youtube.com/watch?v=...">
+            <button id="fetchVideoBtn" class="btn btn-secondary">🔍 جلب الفيديو</button>
+        </div>
+    </div>
+    
+    <!-- Video Info Preview -->
+    <div id="videoInfo" class="video-info" style="display: none;">
+        <div class="video-thumbnail">
+            <img id="videoThumbnail" src="" alt="Video thumbnail">
+        </div>
+        <div class="video-details">
+            <h4 id="videoTitle"></h4>
+            <p id="videoDuration"></p>
+            <p id="videoAuthor"></p>
+        </div>
+    </div>
+    
+    <!-- Download Options -->
+    <div id="downloadOptions" class="download-options" style="display: none;">
+        <h4>خيارات التحميل:</h4>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label for="videoQuality">الجودة:</label>
+                <select id="videoQuality">
+                    <option value="1080p">1080p (Full HD)</option>
+                    <option value="720p" selected>720p (HD)</option>
+                    <option value="480p">480p (SD)</option>
+                    <option value="360p">360p</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="videoFormat">الصيغة:</label>
+                <select id="videoFormat">
+                    <option value="mp4">MP4</option>
+                    <option value="webm">WebM</option>
+                    <option value="audio">🎵 صوت فقط (MP3)</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="button-group">
+            <button id="downloadVideoBtn" class="btn btn-primary">⬇️ تحميل الفيديو</button>
+            <button id="useInEditorBtn" class="btn btn-secondary">🎬 استخدام في المحرر</button>
+        </div>
+    </div>
+    
+    <!-- Progress Bar for YouTube -->
+    <div class="progress-container" id="youtubeProgress" style="display: none;">
+        <div class="progress-bar" id="youtubeProgressBar"></div>
+        <span id="youtubeProgressText">0%</span>
+    </div>
+</section>
                 
                 <div class="form-group">
                     <label for="videoWidth">العرض (px):</label>
