@@ -3,11 +3,154 @@ constructor() {
     this.canvasEditor = null;
     this.videoGenerator = null;
     this.youtubeDownloader = null; // إضافة هذا السطر
-    this.currentVideo = null;
+    this.// بعد this.videoGenerator = new VideoGenerator();
+this.youtubeDownloader = new YouTubeDownloader(); = null;
     this.isGenerating = false;
     this.init();
 }
-class VideoGeneratorApp {
+class VideoGeneratorApp {// إضافة مستمعات أحداث يوتيوب
+setupYouTubeListeners() {
+    const fetchBtn = document.getElementById('fetchVideoBtn');
+    const downloadBtn = document.getElementById('downloadVideoBtn');
+    const useInEditorBtn = document.getElementById('useInEditorBtn');
+    
+    if (fetchBtn) {
+        fetchBtn.addEventListener('click', () => this.fetchYouTubeVideo());
+    }
+    
+    if (downloadBtn) {
+        downloadBtn.addEventListener('click', () => this.downloadYouTubeVideo());
+    }
+    
+    if (useInEditorBtn) {
+        useInEditorBtn.addEventListener('click', () => this.useVideoInEditor());
+    }
+}
+
+// جلب فيديو يوتيوب
+async fetchYouTubeVideo() {
+    const urlInput = document.getElementById('youtubeUrl');
+    const url = urlInput.value.trim();
+    
+    if (!url) {
+        alert('❌ الرجاء إدخال رابط يوتيوب');
+        return;
+    }
+    
+    const videoId = this.youtubeDownloader.extractVideoId(url);
+    
+    if (!videoId) {
+        alert('❌ رابط يوتيوب غير صحيح');
+        return;
+    }
+    
+    try {
+        // إظهار مؤشر تحميل
+        const fetchBtn = document.getElementById('fetchVideoBtn');
+        fetchBtn.disabled = true;
+        fetchBtn.textContent = '⏳ جاري الجلب...';
+        
+        // جلب معلومات الفيديو
+        const videoInfo = await this.youtubeDownloader.fetchVideoInfo(videoId);
+        this.currentYouTubeVideo = videoInfo;
+        
+        // عرض معلومات الفيديو
+        this.displayVideoInfo(videoInfo);
+        
+        // إظهار خيارات التحميل
+        document.getElementById('downloadOptions').style.display = 'block';
+        
+    } catch (error) {
+        console.error('❌ خطأ في جلب الفيديو:', error);
+        alert('❌ حدث خطأ في جلب الفيديو');
+    } finally {
+        const fetchBtn = document.getElementById('fetchVideoBtn');
+        fetchBtn.disabled = false;
+        fetchBtn.textContent = '🔍 جلب الفيديو';
+    }
+}
+
+// عرض معلومات الفيديو
+displayVideoInfo(videoInfo) {
+    const videoInfoDiv = document.getElementById('videoInfo');
+    const thumbnail = document.getElementById('videoThumbnail');
+    const title = document.getElementById('videoTitle');
+    const duration = document.getElementById('videoDuration');
+    const author = document.getElementById('videoAuthor');
+    
+    thumbnail.src = videoInfo.thumbnail;
+    title.textContent = videoInfo.title;
+    duration.textContent = `المدة: ${videoInfo.duration}`;
+    author.textContent = `القناة: ${videoInfo.author}`;
+    
+    videoInfoDiv.style.display = 'flex';
+}
+
+// تحميل فيديو يوتيوب
+async downloadYouTubeVideo() {
+    if (!this.currentYouTubeVideo) {
+        alert('❌ الرجاء جلب فيديو أولاً');
+        return;
+    }
+    
+    const quality = document.getElementById('videoQuality').value;
+    const format = document.getElementById('videoFormat').value;
+    
+    try {
+        // تعطيل الأزرار
+        this.setYouTubeButtonsState(true);
+        
+        // تحميل الفيديو
+        const video = await this.youtubeDownloader.downloadVideo(
+            this.currentYouTubeVideo.id,
+            quality,
+            format
+        );
+        
+        // تحميل الملف
+        this.youtubeDownloader.triggerDownload(video.url, video.title);
+        
+    } catch (error) {
+        console.error('❌ خطأ في تحميل الفيديو:', error);
+        alert('❌ حدث خطأ في تحميل الفيديو');
+    } finally {
+        this.setYouTubeButtonsState(false);
+    }
+}
+
+// استخدام الفيديو في المحرر
+useVideoInEditor() {
+    if (!this.currentYouTubeVideo) {
+        alert('❌ الرجاء جلب فيديو أولاً');
+        return;
+    }
+    
+    // هنا يمكنك إضافة منطق لاستخدام الفيديو في المحرر
+    // مثلاً تعيينه كخلفية أو استخراج إطارات منه
+    
+    alert('🎬 تم تجهيز الفيديو للاستخدام في المحرر!\n' +
+          'يمكنك الآن تعديله وإضافة النصوص عليه.');
+    
+    // مثال: تعيين عنوان الفيديو كنص افتراضي
+    const textInput = document.getElementById('textInput');
+    if (textInput) {
+        textInput.value = this.currentYouTubeVideo.title;
+    }
+    
+    // تحديث المعاينة
+    this.updatePreview();
+}
+
+// تعطيل/تفعيل أزرار يوتيوب
+setYouTubeButtonsState(disabled) {
+    const fetchBtn = document.getElementById('fetchVideoBtn');
+    const downloadBtn = document.getElementById('downloadVideoBtn');
+    const useInEditorBtn = document.getElementById('useInEditorBtn');
+    
+    if (fetchBtn) fetchBtn.disabled = disabled;
+    if (downloadBtn) downloadBtn.disabled = disabled;
+    if (useInEditorBtn) useInEditorBtn.disabled = disabled;
+    }
     constructor() {
         this.canvasEditor = null;
         this.videoGenerator = null;
