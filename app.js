@@ -166,7 +166,8 @@ setYouTubeButtonsState(disabled) {
             this.videoGenerator = new VideoGenerator();
             
             // إعداد المستمعات
-            this.setupEventListeners();
+            this.setupEventListeners();// بعد setupEventListeners الموجودة، أضف:
+this.setupYouTubeListeners();
             
             // تحديث المعاينة الأولية
             this.updatePreview();
