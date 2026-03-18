@@ -3,186 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creative 2026 | محرر الفيديو الذهبي</title>
+    <title>Creative 2026 | تنسيق النصوص الذهبية</title>
     <style>
-        /* تصميم مريح للعين - أسود وذهبي */
         body {
-            background-color: #000000;
-            color: #FFFFFF;
+            background-color: #000;
+            color: #fff;
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 15px;
+            padding: 10px;
             text-align: center;
         }
 
-        h1 {
-            color: #D4AF37; /* ذهبي */
-            font-size: 35px;
-            margin-bottom: 20px;
-        }
+        h1 { color: #D4AF37; font-size: 30px; margin-bottom: 15px; }
 
-        /* حاوية الفيديو */
-        #video-wrapper {
-            border: 3px solid #D4AF37;
+        #canvas-container {
+            border: 2px solid #D4AF37;
             background: #111;
-            margin-bottom: 20px;
+            margin: 0 auto 20px;
+            max-width: 100%;
+            border-radius: 8px;
             overflow: hidden;
-            border-radius: 10px;
         }
 
-        canvas {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
+        canvas { width: 100%; height: auto; display: block; }
 
-        /* المدخلات والأزرار بحجم كبير جداً */
-        input {
+        /* منطقة إدخال النص - جعلناها TextArea لتكتب عدة أسطر */
+        textarea {
             width: 95%;
-            padding: 20px;
-            font-size: 22px;
-            margin: 10px 0;
+            height: 120px;
+            padding: 15px;
+            font-size: 20px;
             background: #222;
             color: #fff;
             border: 2px solid #444;
             border-radius: 10px;
-        }
-
-        input:focus {
-            border-color: #D4AF37;
-            outline: none;
+            margin-bottom: 10px;
+            text-align: center;
         }
 
         .button {
             width: 95%;
-            padding: 22px;
-            font-size: 24px;
+            padding: 20px;
+            font-size: 22px;
             font-weight: bold;
             background-color: #D4AF37;
             color: #000;
             border: none;
             border-radius: 10px;
             cursor: pointer;
-            margin-top: 10px;
+            margin-top: 5px;
         }
 
-        .button-secondary {
-            background-color: #333;
-            color: #D4AF37;
-            border: 1px solid #D4AF37;
-        }
-
-        #status-msg {
-            font-size: 20px;
-            color: #D4AF37;
-            margin-top: 15px;
-            font-weight: bold;
-        }
+        #status { color: #D4AF37; font-weight: bold; margin-top: 10px; }
     </style>
 </head>
 <body>
 
     <h1>Creative 2026</h1>
 
-    <div id="video-wrapper">
+    <div id="canvas-container">
         <canvas id="mainCanvas" width="1280" height="720"></canvas>
     </div>
 
     <div class="controls">
-        <input type="text" id="videoUrl" https://youtu.be/ac_eyiZp6mc" onclick="startApp()">🔍 جلب ومعالجة الفيديو</button>
-      الفيديو</button>
+        <textarea id="userText" placeholder="اكتب هنا.. اضغط Enter لسطر جديد"></textarea>
         
-        <input type="text" id="userText" placehol
-        <button class="button" onclick="startApp()">🔍 جلب ومعالجة الفيديو</button>
+        <input type="text" id="bgUrl" placeholder="رابط الخلفية الذهبية (صورة)">
+        <button class="button" onclick="applyChanges()">✨ تحديث وتنسيق النص</button>
         
-        <input type="text" id="userText" placeholder="اكتب النص الذهبي الذي سيظهر">
-        <button class="button button-secondary" onclick="updateOverlay()">✍️ تحديث النص السينمائي</button>
-        
-        <button id="saveBtn" class="button" style="background-color: #28a745; color: white; display:none;" onclick="recordVideo()">💾 حفظ الفيديو النهائي</button>
+        <button id="saveBtn" class="button" style="background-color: #28a745; color: white; display:none;" onclick="startRecording()">💾 حفظ الفيديو المنسق</button>
     </div>
 
-    <p id="status-msg">جاهز لبدء مشروعك الجديد...</p>
+    <p id="status">جاهز لتنسيق إبداعك...</p>
 
     <script>
         const canvas = document.getElementById('mainCanvas');
         const ctx = canvas.getContext('2d');
-        const video = document.createElement('video');
-        video.crossOrigin = "anonymous";
-        
-        let overlayText = "Creative 2026";
+        const bgImg = new Image();
+        bgImg.crossOrigin = "anonymous";
 
-        // وظيفة تشغيل التطبيق والجلب
-        function startApp() {
-            const url = document.getElementById('videoUrl').value;
-            const status = document.getElementById('status-msg');
+        function applyChanges() {
+            const url = document.getElementById('bgUrl').value;
+            if (url) {
+                bgImg.src = url;
+                bgImg.onload = () => {
+                    document.getElementById('saveBtn').style.display = "block";
+                    render();
+                };
+            } else {
+                render(); // رسم النص حتى بدون خلفية للتجربة
+            }
+        }
 
-            if (!url) {
-                alert("من فضلك ضع رابط الفيديو");
-                return;
+        function render() {
+            // 1. مسح الرسم القديم ورسم الخلفية
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (bgImg.complete && bgImg.src) {
+                ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
             }
 
-            status.innerText = "⏳ جاري محاكاة الربط وتجهيز المحرك...";
+            // 2. إعدادات النص الذهبي
+            ctx.font = "bold 65px Arial";
+            ctx.textAlign = "center";
+            ctx.shadowColor = "black";
+            ctx.shadowBlur = 20;
+
+            let gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0.4, "#D4AF37");
+            gradient.addColorStop(0.6, "#FFD700");
+            ctx.fillStyle = gradient;
+
+            // 3. تقسيم النص لأسطر (التنسيق الذكي)
+            const text = document.getElementById('userText').value || "Creative\n2026";
+            const lines = text.split('\n'); // تقسيم النص عند كل Enter
+            const lineHeight = 80; // المسافة بين الأسطر
             
-            // رابط فيديو تجريبي ليعمل معك فوراً حتى نربط الـ API
-            video.src = "https://www.w3schools.com/html/mov_bbb.mp4";
-            video.loop = true;
-            video.play();
+            // حساب نقطة البداية ليكون النص في المنتصف تماماً
+            const totalHeight = lines.length * lineHeight;
+            let y = (canvas.height - totalHeight) / 2 + 50;
 
-            video.onplay = () => {
-                status.innerText = "✅ الفيديو يعمل! يمكنك إضافة النص وحفظ العمل.";
-                document.getElementById('saveBtn').style.display = "block";
-                draw();
-            };
+            lines.forEach(line => {
+                ctx.fillText(line, canvas.width / 2, y);
+                y += lineHeight;
+            });
+
+            requestAnimationFrame(render);
         }
 
-        // تحديث النص من المدخلات
-        function updateOverlay() {
-            overlayText = document.getElementById('userText').value || "Creative 2026";
-        }
-
-        // عملية الرسم المستمرة (الفيديو + الفلتر + النص)
-        function draw() {
-            if (!video.paused && !video.ended) {
-                // 1. رسم الفيديو
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-                // 2. إضافة فلتر تعتيم خفيف ليبرز النص
-                ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                // 3. رسم النص الذهبي الفخم
-                ctx.font = "bold 70px Arial";
-                let goldGrad = ctx.createLinearGradient(0, 500, 0, 700);
-                goldGrad.addColorStop(0, "#D4AF37");
-                goldGrad.addColorStop(1, "#FFD700");
-
-                ctx.fillStyle = goldGrad;
-                ctx.textAlign = "center";
-                ctx.shadowColor = "black";
-                ctx.shadowBlur = 20;
-                ctx.fillText(overlayText, canvas.width / 2, 650);
-            }
-            requestAnimationFrame(draw);
-        }
-
-        // وظيفة تسجيل الفيديو وحفظه على هاتفك
-        function recordVideo() {
+        function startRecording() {
             const stream = canvas.captureStream(30);
             const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
             const chunks = [];
-
             recorder.ondataavailable = e => chunks.push(e.data);
             recorder.onstop = () => {
                 const blob = new Blob(chunks, { type: 'video/webm' });
-                const downloadUrl = URL.createObjectURL(blob);
                 const a = document.createElement('a');
-                a.href = downloadUrl;
-                a.download = 'Creative_2026_Pro.webm';
+                a.href = URL.createObjectURL(blob);
+                a.download = 'Formatted_Video.webm';
                 a.click();
             };
-
             recorder.start();
-            alert("بدأ التسجيل (10 ثوانٍ).. انتظر قليلاً");
+            alert("بدأ تسجيل الفيديو المنسق.. انتظر 10 ثوانٍ");
             setTimeout(() => recorder.stop(), 10000);
         }
     </script>
