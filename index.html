@@ -76,7 +76,26 @@
 
     <p id="status">جاهز لتنسيق إبداعك...</p>
 
-    <script>
+    <script>// وظيفة تفعيل الاشتراك الكامل
+function activateFullVersion() {
+    // إعادة تعيين العداد ليكون -1 (رمز للاشتراك المفتوح)
+    localStorage.setItem('creative2026_count', -1);
+    
+    // إظهار رسالة ترحيب فخمة بخط كبير
+    const status = document.getElementById('status');
+    status.innerHTML = `
+        <div style="border: 2px solid #D4AF37; padding: 20px; background: #000; border-radius: 15px;">
+            <h2 style="color: #D4AF37; font-size: 30px;">مرحباً بك في النادي الذهبي 👑</h2>
+            <p style="font-size: 22px;">تم تفعيل اشتراكك بنجاح. يمكنك الآن استخراج فيديوهات غير محدودة بجودة فائقة.</p>
+            <button class="button" onclick="location.reload()">ابدأ الإبداع الآن</button>
+        </div>
+    `;
+    
+    // إخفاء لوحة الاشتراك وإعادة زر الحفظ
+    document.getElementById('subscription-panel').style.display = 'none';
+    document.getElementById('saveBtn').style.display = 'block';
+}
+
         const canvas = document.getElementById('mainCanvas');
         const ctx = canvas.getContext('2d');
         const bgImg = new Image();
