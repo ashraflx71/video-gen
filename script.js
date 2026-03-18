@@ -35,8 +35,26 @@ function speakText(text) {
 
 // تحديث اللحظة (Real-time Preview)
 textInput.addEventListener('input', (e) => {
-    drawFrame(e.target.value);
-});
+    drawFrame(
+function drawFrame(text) {
+    // تنظيف المساحة بالأسود الفخم
+    ctx.fillStyle = bgColor;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // --- إضافة اللوجو في الزاوية (العلامة المائية) ---
+    ctx.fillStyle = "rgba(212, 175, 55, 0.5)"; // ذهبي شفاف قليلاً
+    ctx.font = "italic bold 24px Arial";
+    ctx.textAlign = "right";
+    ctx.fillText("Creative 2026 ©", canvas.width - 30, 50); 
+    // ------------------------------------------
+
+    // رسم النص الأساسي في المنتصف
+    ctx.fillStyle = themeColor; // ذهبي خالص
+    ctx.font = "bold 45px Arial"; // خط كبير جداً وواضح
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+}
 
 // وظيفة التوليد الاحترافية
 exportBtn.addEventListener('click', () => {
