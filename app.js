@@ -1,4 +1,12 @@
-// التطبيق الرئيسي
+// التطبيق الرئيسي// في بداية كلاس VideoGeneratorApp
+constructor() {
+    this.canvasEditor = null;
+    this.videoGenerator = null;
+    this.youtubeDownloader = null; // إضافة هذا السطر
+    this.currentVideo = null;
+    this.isGenerating = false;
+    this.init();
+}
 class VideoGeneratorApp {
     constructor() {
         this.canvasEditor = null;
