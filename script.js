@@ -1,70 +1,89 @@
-// إعدادات المحرك الرسومي
+// --- إعدادات المحرك السينمائي Creative 2026 ---
 const canvas = document.getElementById('videoCanvas');
 const ctx = canvas.getContext('2d');
 const textInput = document.getElementById('videoText');
 const exportBtn = document.getElementById('exportBtn');
 
-// إعدادات افتراضية للفخامة (اللون الذهبي والأسود)
-const themeColor = "#D4AF37"; // Gold
-const bgColor = "#000000";    // Black
+// إعدادات الألوان الفخمة
+const GOLD_COLOR = "#D4AF37";
+const BLACK_BG = "#000000";
 
-// وظيفة لرسم الإطارات (Frames) بدقة عالية
-function drawFrame(text) {
-    // تنظيف المساحة
-    ctx.fillStyle = bgColor;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // إعدادات النص (خط كبير 30px للقراءة السهلة)
-    ctx.fillStyle = themeColor;
-    ctx.font = "bold 30px Arial";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-
-    // رسم النص في منتصف الكانفاس
-    ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+// إنشاء جسيمات الذهب المتحركة (50 ذرة لضمان خفة الأداء على الموبايل)
+const particles = [];
+for (let i = 0; i < 50; i++) {
+    particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        size: Math.random() * 3 + 1,
+        speed: Math.random() * 1.5 + 0.5,
+        opacity: Math.random()
+    });
 }
 
-// ميزة تحويل النص إلى صوت (Text-to-Speech)
+// وظيفة رسم وتحديث الجسيمات (خلفية حية)
+function drawBackground() {
+    ctx.fillStyle = BLACK_BG;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    particles.forEach(p => {
+        ctx.fillStyle = `rgba(212, 175, 55, ${p.opacity})`;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+
+        // تحريك الجسيم للأسفل بنعومة
+        p.y += p.speed;
+        if (p.y > canvas.height) p.y = 0;
+    });
+}
+
+// وظيفة رسم النص واللوجو (الواجهة الاحترافية)
+function drawUI() {
+    const text = textInput.value || "Creative 2026";
+
+    // 1. رسم اللوجو (العلامة المائية) في الزاوية
+    ctx.fillStyle = "rgba(212, 175, 55, 0.4)";
+    ctx.font = "italic 24px Arial";
+    ctx.textAlign = "right";
+    ctx.fillText("Creative 2026 ©", canvas.width - 40, 60);
+
+    // 2. رسم النص الأساسي (كبير وواضح جداً)
+    ctx.fillStyle = GOLD_COLOR;
+    ctx.font = "bold 60px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    
+    // إضافة ظل خفيف للنص لزيادة الفخامة
+    ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+    ctx.shadowBlur = 10;
+    ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+    ctx.shadowBlur = 0; // إعادة التعيين
+}
+
+// الحلقة البرمجية للتحديث المستمر (Animation Loop)
+function animate() {
+    drawBackground();
+    drawUI();
+    requestAnimationFrame(animate);
+}
+
+// ميزة تحويل النص إلى صوت (Arabic TTS)
 function speakText(text) {
     if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel(); // إيقاف أي صوت سابق
         const msg = new SpeechSynthesisUtterance(text);
-        msg.lang = 'ar-SA'; // دعم اللغة العربية
+        msg.lang = 'ar-SA';
+        msg.rate = 0.9; // سرعة هادئة وفخمة
         window.speechSynthesis.speak(msg);
     }
 }
 
-// تحديث اللحظة (Real-time Preview)
-textInput.addEventListener('input', (e) => {
-    drawFrame(
-function drawFrame(text) {
-    // تنظيف المساحة بالأسود الفخم
-    ctx.fillStyle = bgColor;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // --- إضافة اللوجو في الزاوية (العلامة المائية) ---
-    ctx.fillStyle = "rgba(212, 175, 55, 0.5)"; // ذهبي شفاف قليلاً
-    ctx.font = "italic bold 24px Arial";
-    ctx.textAlign = "right";
-    ctx.fillText("Creative 2026 ©", canvas.width - 30, 50); 
-    // ------------------------------------------
-
-    // رسم النص الأساسي في المنتصف
-    ctx.fillStyle = themeColor; // ذهبي خالص
-    ctx.font = "bold 45px Arial"; // خط كبير جداً وواضح
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(text, canvas.width / 2, canvas.height / 2);
-}
-
-// وظيفة التوليد الاحترافية
+// زر التوليد والتحميل
 exportBtn.addEventListener('click', () => {
-    const text = textInput.value;
-    
-    // 1. تشغيل الصوت تزامناً مع الفيديو
+    const text = textInput.value || "Creative 2026";
     speakText(text);
 
-    // 2. تحويل الكانفاس إلى صورة أو دفق فيديو (Stream)
-    const stream = canvas.captureStream(30); // 30 إطار في الثانية
+    const stream = canvas.captureStream(30);
     const recorder = new MediaRecorder(stream);
     const chunks = [];
 
@@ -74,18 +93,15 @@ exportBtn.addEventListener('click', () => {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'Creative_2026_Video.webm';
+        a.download = `Creative_2026_${Date.now()}.webm`;
         a.click();
-        
-        // تنظيف الذاكرة فوراً (Memory Management)
         setTimeout(() => URL.revokeObjectURL(url), 1000);
     };
 
     recorder.start();
-    setTimeout(() => recorder.stop(), 5000); // توليد فيديو مدته 5 ثوانٍ كمثال
-    
-    alert("بدأ توليد الفيديو، سيتم التحميل تلقائياً عند الانتهاء.");
+    alert("جاري تسجيل المشهد السينمائي.. انتظر 5 ثوانٍ للتحميل.");
+    setTimeout(() => recorder.stop(), 5000); 
 });
 
-// الرسم الأولي عند فتح الصفحة
-drawFrame("Creative 2026");
+// بدء التشغيل فور فتح الصفحة
+animate();
