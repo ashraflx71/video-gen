@@ -1,103 +1,58 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>محرك فيديو Creative 2026 - المطور</title>
-    <style>
-        :root {
-            --gold: #D4AF37;
-            --black: #000000;
-            --dark-gray: #1a1a1a;
-        }
-        body {
-            background-color: var(--black);
-            color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .container {
-            width: 100%;
-            max-width: 600px;
-            text-align: center;
-        }
-        h2 {
-            color: var(--gold);
-            font-size: 28px;
-            border-bottom: 2px solid var(--gold);
-            padding-bottom: 10px;
-            margin-bottom: 30px;
-        }
-        label {
-            display: block;
-            font-size: 22px;
-            margin-bottom: 15px;
-            color: #e0e0e0;
-        }
-        textarea {
-            width: 100%;
-            height: 150px;
-            background-color: var(--dark-gray);
-            border: 2px solid var(--gold);
-            border-radius: 10px;
-            color: white;
-            padding: 15px;
-            font-size: 20px;
-            box-sizing: border-box;
-            margin-bottom: 25px;
-        }
-        button {
-            background: linear-gradient(45deg, #B8860B, #D4AF37);
-            color: black;
-            border: none;
-            padding: 15px 30px;
-            font-size: 22px;
-            font-weight: bold;
-            border-radius: 50px;
-            cursor: pointer;
-            width: 100%;
-            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
-            transition: 0.3s;
-        }
-        button:active {
-            transform: scale(0.95);
-        }
-        footer {
-            margin-top: 40px;
-            font-size: 16px;
-            color: var(--gold);
-            opacity: 0.8;
-        }
-    </style>
-</head>
-<body>
 
-<div class="container">
-    <h2>محرك فيديو Creative 2026</h2>
-    
-    <label for="videoText">النص المراد تحويله لفيديو:</label>
-    <textarea id="videoText" placeholder="اكتب النص هنا..."></textarea>
+/* الإعدادات العامة */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 
-    <button onclick="generateVideo()">🎬 توليد وتحميل الفيديو</button>
-    
-    <footer>تطوير: أشرف حسن علي - 2026</footer>
-</div>
+body {
+    background-color: #000000; /* خلفية سوداء فخمة */
+    color: #FFFFFF;
+    line-height: 1.6;
+    font-size: 20px; /* خط كبير لسهولة القراءة من الهاتف */
+}
 
-<script>
-    function generateVideo() {
-        const text = document.getElementById('videoText').value;
-        if(!text) {
-            alert("يرجى إدخال النص أولاً");
-            return;
-        }
-        // هنا يتم ربط أوامر البايثون أو مكتبة التوليد الخاصة بك
-        console.log("جاري معالجة النص: " + text);
+/* التنسيقات الذهبية */
+h1, h2, h3, .gold-text {
+    color: #D4AF37; /* لون ذهبي كلاسيكي */
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+/* تنسيق الحاويات */
+.container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* تنسيق الأزرار */
+.button {
+    background-color: #D4AF37;
+    color: #000000;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 8px;
+    font-size: 22px;
+    font-weight: bold;
+    cursor: pointer;
+    display: inline-block;
+    text-decoration: none;
+}
+
+.button:hover {
+    background-color: #FFD700; /* ذهبي أفتح عند التمرير */
+}
+
+/* تحسين العرض على الموبايل */
+@media (max-width: 600px) {
+    body {
+        font-size: 22px; /* تكبير الخط أكثر للشاشات الصغيرة */
     }
-</script>
-
-</body>
-</html>
+    
+    .container {
+        padding: 15px;
+    }
+}
