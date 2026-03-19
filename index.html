@@ -3,89 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creative 2026 | Studio Pro</title>
+    <title>Creative 2026 | YouTube & Studio</title>
     <style>
-        :root { --gold: #D4AF37; --black: #000; --dark: #0a0a0a; }
-        body { background: var(--black); color: var(--gold); font-family: 'Arial', sans-serif; margin: 0; padding: 15px; text-align: center; }
+        :root { --gold: #D4AF37; --black: #000; }
+        body { background: var(--black); color: var(--gold); font-family: Arial; margin: 0; padding: 15px; text-align: center; }
+        .main-card { max-width: 500px; margin: auto; border: 2px solid var(--gold); border-radius: 20px; padding: 20px; background: #050505; }
         
-        .main-container { max-width: 500px; margin: auto; border: 2px solid var(--gold); border-radius: 20px; padding: 20px; background: var(--dark); box-shadow: 0 0 25px rgba(212, 175, 55, 0.2); }
+        /* شريط جلب اليوتيوب */
+        .yt-box { display: flex; gap: 5px; margin-bottom: 20px; }
+        .yt-input { flex: 1; background: #111; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 8px; outline: none; }
+        .yt-btn { background: #f00; color: #fff; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
-        /* شريط البحث */
-        .search-box { display: flex; gap: 5px; margin-bottom: 20px; background: #111; padding: 5px; border-radius: 12px; border: 1px solid #333; }
-        .search-input { flex: 1; background: transparent; border: none; color: #fff; padding: 10px; font-size: 16px; outline: none; }
-        .search-btn { background: var(--gold); color: #000; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        /* منطقة النص والزرار */
+        textarea { width: 100%; height: 70px; background: #111; color: #fff; border: 1px solid var(--gold); border-radius: 10px; padding: 10px; box-sizing: border-box; }
+        .action-btn { background: var(--gold); color: #000; border: none; padding: 12px; width: 100%; margin: 10px 0; border-radius: 10px; font-weight: bold; font-size: 18px; cursor: pointer; }
 
-        /* منطقة إدخال النص والزرار الجديد */
-        .input-group { margin-bottom: 15px; }
-        textarea { width: 100%; height: 80px; background: #111; color: #fff; border: 1px solid var(--gold); border-radius: 10px; font-size: 18px; padding: 10px; box-sizing: border-box; resize: none; }
-        .action-btn { background: #1a1a1a; color: var(--gold); border: 1px solid var(--gold); padding: 10px; width: 100%; margin-top: 5px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 18px; transition: 0.3s; }
-        .action-btn:active { background: var(--gold); color: #000; }
-
-        /* منطقة الفيديو */
-        .video-wrap { width: 100%; position: relative; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid #222; margin-top: 10px; }
-        video { width: 100%; display: block; }
-        #caption { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.7); color: var(--gold); padding: 15px 0; font-size: 24px; font-weight: bold; display: none; z-index: 10; min-height: 40px; }
-
-        .btn-upload { background: var(--gold); color: #000; padding: 18px; width: 100%; font-size: 22px; font-weight: bold; border-radius: 12px; border: none; cursor: pointer; margin-top: 20px; }
+        /* منطقة العرض الذكية */
+        .display-wrap { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 12px; overflow: hidden; position: relative; border: 1px solid #222; }
+        #ytFrame { width: 100%; height: 100%; display: none; border: none; }
+        #localVid { width: 100%; height: 100%; display: none; }
+        
+        /* النص الذهبي */
+        #caption { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.8); color: var(--gold); padding: 10px 0; font-size: 22px; font-weight: bold; display: none; z-index: 10; pointer-events: none; }
     </style>
 </head>
 <body>
 
-    <div class="main-container">
-        <div class="search-box">
-            <input type="text" id="sInp" class="search-input" placeholder="بحث في محتوى Creative...">
-            <button class="search-btn" onclick="alert('جاري البحث...')">بحث 🔍</button>
+    <div class="main-card">
+        <h2>Creative 2026 Studio</h2>
+
+        <div class="yt-box">
+            <input type="text" id="ytUrl" class="yt-input" placeholder="ضع رابط فيديو يوتيوب هنا...">
+            <button class="yt-btn" onclick="fetchYT()">جلب 📺</button>
         </div>
 
-        <h2 style="margin: 0 0 10px 0;">CREATIVE 2026</h2>
-        
-        <div class="input-group">
-            <textarea id="msgIn" placeholder="اكتب نص الفيديو هنا (مثلاً: قواعد الإتيكيت)..."></textarea>
-            <button class="action-btn" onclick="applyText()">تطبيق النص على الفيديو ✍️</button>
-        </div>
+        <textarea id="msgIn" placeholder="اكتب النص الذي تريد ظهوره..."></textarea>
+        <button class="action-btn" onclick="applyText()">تطبيق النص على المعاينة ✍️</button>
 
-        <div class="video-wrap">
-            <video id="vid" controls playsinline></video>
+        <div class="display-wrap">
+            <iframe id="ytFrame" allow="autoplay"></iframe>
+            <video id="localVid" controls playsinline></video>
             <div id="caption"></div>
+            <p id="waitMsg" style="color:#444; margin-top:15%;">بانتظار الفيديو...</p>
         </div>
 
         <input type="file" id="fIn" accept="video/*" style="display:none">
-        <button class="btn-upload" onclick="document.getElementById('fIn').click()">📲 اختيار فيديو من هاتفك</button>
-        
-        <p style="font-size:11px; color:#444; margin-top:15px;">Official Studio - Eng. Ashraf © 2026</p>
+        <button class="action-btn" style="background:none; border:1px solid var(--gold); color:var(--gold);" onclick="document.getElementById('fIn').click()">📲 أو ارفع فيديو من هاتفك</button>
     </div>
 
     <script>
-        const v = document.getElementById('vid');
-        const f = document.getElementById('fIn');
+        const ytFrame = document.getElementById('ytFrame');
+        const localVid = document.getElementById('localVid');
         const cap = document.getElementById('caption');
-        const inp = document.getElementById('msgIn');
+        const waitMsg = document.getElementById('waitMsg');
 
-        // وظيفة الزرار الجديد (تطبيق النص)
-        function applyText() {
-            const val = inp.value;
-            if (val.trim() === "") {
-                alert("من فضلك اكتب نصاً أولاً يا هندسة!");
-                cap.style.display = "none";
-            } else {
-                cap.innerText = val;
+        // وظيفة جلب فيديو يوتيوب
+        function fetchYT() {
+            const url = document.getElementById('ytUrl').value;
+            const videoId = extractId(url);
+            if (videoId) {
+                localVid.style.display = "none";
+                ytFrame.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+                ytFrame.style.display = "block";
+                waitMsg.style.display = "none";
                 cap.style.display = "block";
-                alert("تم بنجاح! النص الآن يظهر فوق الفيديو.");
+            } else {
+                alert("يا هندسة، الرابط غير صحيح، يرجى التأكد منه.");
             }
         }
 
-        // معالجة رفع الفيديو
-        f.addEventListener('change', function() {
-            const file = this.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    v.src = e.target.result;
-                    v.play();
-                };
-                reader.readAsDataURL(file);
+        // وظيفة استخراج الـ ID من الرابط
+        function extractId(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length == 11) ? match[2] : false;
+        }
+
+        function applyText() {
+            const val = document.getElementById('msgIn').value;
+            if(val) {
+                cap.innerText = val;
+                cap.style.display = "block";
             }
-        });
+        }
+
+        // رفع محلي
+        document.getElementById('fIn').onchange = function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                ytFrame.style.display = "none";
+                localVid.src = URL.createObjectURL(file);
+                localVid.style.display = "block";
+                waitMsg.style.display = "none";
+                cap.style.display = "block";
+                localVid.play();
+            }
+        };
     </script>
 </body>
 </html>
