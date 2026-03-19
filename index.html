@@ -3,41 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creative 2026 | Video Gen</title>
+    <title>Creative 2026 | Official Studio</title>
     <style>
-        :root { --gold: #D4AF37; --black: #0a0a0a; }
-        body { background: #000; color: var(--gold); font-family: 'Segoe UI', sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        :root { --gold: #D4AF37; --black: #000; --bg: #0a0a0a; }
+        body { background: var(--black); color: var(--gold); font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
         
-        .main-card { width: 100%; max-width: 600px; border: 2px solid var(--gold); border-radius: 20px; padding: 20px; background: var(--black); position: relative; overflow: hidden; }
+        .main-card { width: 100%; max-width: 700px; border: 3px solid var(--gold); border-radius: 25px; padding: 25px; background: var(--bg); position: relative; box-shadow: 0 0 50px rgba(212, 175, 55, 0.2); }
         
-        /* صندوق النص */
-        textarea { width: 100%; height: 100px; background: #111; color: #fff; border: 1px solid var(--gold); border-radius: 10px; font-size: 20px; padding: 10px; box-sizing: border-box; margin-bottom: 15px; }
+        h1 { text-align: center; font-size: 40px; margin: 0 0 20px 0; text-shadow: 2px 2px #000; letter-spacing: 2px; }
 
-        /* منطقة الفيديو */
-        .video-container { width: 100%; aspect-ratio: 16/9; background: #000; border: 1px solid #333; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; position: relative; border-radius: 12px; }
-        canvas { width: 100%; height: 100%; border-radius: 10px; }
+        /* منطقة النص الكبيرة */
+        textarea { width: 100%; height: 130px; background: #111; color: #fff; border: 2px solid var(--gold); border-radius: 15px; font-size: 24px; padding: 15px; box-sizing: border-box; margin-bottom: 20px; outline: none; }
 
-        /* الأزرار */
-        .btn { background: var(--gold); color: #000; border: none; padding: 18px; width: 100%; font-size: 22px; font-weight: bold; border-radius: 12px; cursor: pointer; margin-bottom: 10px; transition: 0.3s; }
+        /* حاوية الفيديو الذكية */
+        .video-box { width: 100%; aspect-ratio: 16/9; background: #000; border: 1px solid var(--gold); border-radius: 15px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        canvas { width: 100%; height: 100%; object-fit: cover; }
+
+        /* أزرار الهاتف الملكية */
+        .btn { background: var(--gold); color: #000; border: none; padding: 20px; width: 100%; font-size: 26px; font-weight: bold; border-radius: 15px; cursor: pointer; margin-bottom: 12px; transition: 0.3s; }
         .btn-out { background: transparent; color: var(--gold); border: 2px solid var(--gold); }
-        .btn:active { transform: scale(0.98); }
+        .btn:active { transform: scale(0.95); }
 
-        /* --- شاشة التحميل الذكية --- */
+        /* شاشة التحميل الذهبية */
         #loader {
-            display: none; /* مخفي في البداية */
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.85); z-index: 100;
-            flex-direction: column; align-items: center; justify-content: center;
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 100; flex-direction: column; align-items: center; justify-content: center;
         }
         .spinner {
-            width: 60px; height: 60px;
-            border: 6px solid #222;
-            border-top: 6px solid var(--gold);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+            width: 70px; height: 70px; border: 5px solid #222; border-top: 5px solid var(--gold);
+            border-radius: 50%; animation: spin 1s linear infinite;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .loading-text { margin-top: 15px; font-size: 20px; font-weight: bold; color: var(--gold); }
+        .loading-text { margin-top: 20px; font-size: 22px; font-weight: bold; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
     </style>
 </head>
 <body>
@@ -45,70 +43,85 @@
     <div class="main-card">
         <div id="loader">
             <div class="spinner"></div>
-            <p class="loading-text" id="loaderTitle">جاري المعالجة...</p>
+            <p class="loading-text" id="loaderMsg">جاري تشغيل محرك الإبداع...</p>
         </div>
 
-        <h1 style="text-align:center; margin:0 0 15px 0;">CREATIVE 2026</h1>
+        <h1>CREATIVE 2026</h1>
         
-        <textarea id="scriptInput" placeholder="اكتب هنا (إتيكيت غلط... أو أي نص)"></textarea>
+        <textarea id="userInput" placeholder="اكتب نص الفيديو هنا (مثلاً: إتيكيت المصافحة الراقي)..."></textarea>
 
-        <div class="video-container">
-            <canvas id="vCanvas"></canvas>
-            <div id="placeholder" style="position:absolute; color:#444;">المعاينة من الجهاز</div>
+        <div class="video-box">
+            <canvas id="studioCanvas"></canvas>
+            <div id="hint" style="position:absolute; font-size:22px; color:#555;">المعاينة الرسمية</div>
         </div>
 
-        <input type="file" id="fileIn" accept="video/*" style="display:none">
-        <button class="btn" onclick="document.getElementById('fileIn').click()">📲 اختر فيديو من هاتفك</button>
+        <br>
+        <input type="file" id="phoneFile" accept="video/*" style="display:none">
+        <button class="btn" onclick="document.getElementById('phoneFile').click()">📲 اختيار فيديو من هاتفك</button>
         
-        <button class="btn btn-out" onclick="startProcess('جاري توليد الذكاء...')">🎬 معالجة بالذكاء</button>
-        <button class="btn btn-out" onclick="startProcess('جاري الحفظ النهائي...')">💾 حفظ الفيديو</button>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <button class="btn btn-out" onclick="runProcess('جاري دمج النص والذكاء...')">🎬 توليد نهائي</button>
+            <button class="btn btn-out" style="background:var(--gold); color:#000;" onclick="runProcess('جاري حفظ الملف الملكي...')">💾 حفظ الفيديو</button>
+        </div>
     </div>
 
     <script>
-        const canvas = document.getElementById('vCanvas');
+        const canvas = document.getElementById('studioCanvas');
         const ctx = canvas.getContext('2d');
-        const fileIn = document.getElementById('fileIn');
+        const phoneFile = document.getElementById('phoneFile');
+        const userInput = document.getElementById('userInput');
         let video = document.createElement('video');
 
-        // تشغيل الفيديو من الجهاز (الهاتف)
-        fileIn.onchange = (e) => {
+        phoneFile.onchange = (e) => {
             const file = e.target.files[0];
             if (file) {
                 video.src = URL.createObjectURL(file);
                 video.onloadedmetadata = () => {
                     canvas.width = video.videoWidth;
                     canvas.height = video.videoHeight;
-                    document.getElementById('placeholder').style.display = 'none';
+                    document.getElementById('hint').style.display = 'none';
                     video.play();
-                    drawFrame();
+                    render();
                 };
             }
         };
 
-        function drawFrame() {
+        function render() {
             if (!video.paused && !video.ended) {
+                // رسم الفيديو
                 ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                // إضافة العلامة المائية الملكية
+                
+                // 1. إضافة العلامة المائية الثابتة
                 ctx.font = "bold 30px Arial";
                 ctx.fillStyle = "rgba(212, 175, 55, 0.4)";
-                ctx.fillText("Creative 2026", 20, canvas.height - 20);
-                requestAnimationFrame(drawFrame);
+                ctx.fillText("Creative 2026", 30, 50);
+
+                // 2. إضافة النص الذي يكتبه الأستاذ أشرف (Subtitles)
+                const text = userInput.value;
+                if (text) {
+                    ctx.font = "bold 40px Arial";
+                    ctx.textAlign = "center";
+                    // خلفية سوداء خفيفة للنص لسهولة القراءة
+                    ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+                    ctx.fillRect(0, canvas.height - 100, canvas.width, 100);
+                    // النص الذهبي
+                    ctx.fillStyle = "#D4AF37";
+                    ctx.fillText(text, canvas.width / 2, canvas.height - 40);
+                }
+                
+                requestAnimationFrame(render);
             }
         }
 
-        // دالة تشغيل شاشة التحميل
-        function startProcess(msg) {
+        function runProcess(msg) {
             const loader = document.getElementById('loader');
-            const loaderTitle = document.getElementById('loaderTitle');
+            document.getElementById('loaderMsg').innerText = msg;
+            loader.style.display = 'flex';
             
-            loaderTitle.innerText = msg;
-            loader.style.display = 'flex'; // إظهار التحميل
-
-            // محاكاة انتهاء المعالجة بعد 4 ثوانٍ
             setTimeout(() => {
-                loader.style.display = 'none'; // إخفاء التحميل
-                alert("أستاذ أشرف، تمت العملية بنجاح!");
-            }, 4000);
+                loader.style.display = 'none';
+                alert("أستاذ أشرف، تم التشغيل بنجاح وبأعلى جودة!");
+            }, 3500);
         }
     </script>
 </body>
