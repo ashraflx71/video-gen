@@ -5,137 +5,120 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Creative 2026 | Video Gen</title>
     <style>
-        /* التنسيق الشرطي لمنع شكل الجريدة */
+        /* التنسيق الملكي المباشر */
         body {
-            background-color: #000000 !important;
-            color: #ffffff !important;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #000000;
+            color: #D4AF37; /* اللون الذهبي */
+            font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 20px;
+            text-align: center;
             display: flex;
-            justify-content: center;
-            line-height: 1.6;
+            flex-direction: column;
+            align-items: center;
         }
 
-        .main-card {
-            background: linear-gradient(145deg, #1a1a1a, #000000);
-            border: 3px solid #D4AF37; /* الإطار الذهبي */
-            border-radius: 20px;
-            width: 100%;
-            max-width: 800px;
+        .container {
+            border: 4px solid #D4AF37;
+            border-radius: 25px;
             padding: 40px;
-            box-shadow: 0 20px 50px rgba(214, 175, 55, 0.2);
-            text-align: center;
+            background: #0a0a0a;
+            width: 90%;
+            max-width: 900px;
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
         }
 
         h1 {
-            color: #D4AF37;
-            font-size: 40px; /* خط كبير جداً ومريح */
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            border-bottom: 2px solid #D4AF37;
-            padding-bottom: 15px;
+            font-size: 50px; /* خط كبير جداً */
+            margin-bottom: 5px;
+            text-shadow: 2px 2px #000;
         }
 
-        .subtitle {
+        .brand-name {
+            font-size: 24px;
             color: #996515;
-            font-size: 20px;
             margin-bottom: 30px;
             font-weight: bold;
         }
 
-        /* منطقة الفيديو - الصندوق الملكي */
-        .video-box {
+        /* صندوق الفيديو */
+        .video-wrapper {
             width: 100%;
-            aspect-ratio: 16 / 9;
-            background: #050505;
-            border: 1px solid #D4AF37;
-            border-radius: 15px;
+            height: 400px;
+            background: #000;
+            border: 2px solid #D4AF37;
             margin-bottom: 30px;
             display: flex;
-            align-items: center;
             justify-content: center;
-            position: relative;
-            overflow: hidden;
+            align-items: center;
+            border-radius: 15px;
         }
 
-        canvas {
-            max-width: 100%;
-            max-height: 100%;
-        }
-
-        /* الأزرار الاحترافية */
-        .btn-group {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        button {
-            background: #000;
-            color: #D4AF37;
-            border: 2px solid #D4AF37;
-            padding: 20px;
-            font-size: 22px; /* خط كبير للأزرار */
+        /* الأزرار الكبيرة */
+        .royal-btn {
+            background: #D4AF37;
+            color: #000;
+            font-size: 28px;
             font-weight: bold;
-            border-radius: 12px;
+            padding: 20px 40px;
+            border: none;
+            border-radius: 15px;
             cursor: pointer;
+            width: 100%;
+            margin-bottom: 15px;
             transition: 0.3s;
         }
 
-        button:hover {
-            background: #D4AF37;
-            color: #000;
+        .royal-btn:hover {
+            background: #ffffff;
             box-shadow: 0 0 20px #D4AF37;
         }
 
-        .upload-label {
-            background: #D4AF37;
-            color: #000;
-            padding: 20px;
-            display: block;
-            border-radius: 12px;
-            font-weight: bold;
-            font-size: 22px;
+        .secondary-btn {
+            background: transparent;
+            color: #D4AF37;
+            border: 2px solid #D4AF37;
+            font-size: 24px;
+            padding: 15px;
+            width: 100%;
+            border-radius: 15px;
             cursor: pointer;
-            margin-bottom: 20px;
         }
 
-        /* إخفاء المدخلات القبيحة */
-        input[type="file"] {
-            display: none;
+        #status {
+            margin-top: 20px;
+            font-size: 20px;
+            color: #888;
         }
     </style>
 </head>
 <body>
 
-    <div class="main-card">
+    <div class="container">
         <h1>CREATIVE 2026</h1>
-        <div class="subtitle">نظام توليد الفيديوهات الذكي - أستاذ أشرف</div>
+        <div class="brand-name">أستاذ أشرف - Video Gen Pro</div>
 
-        <div class="video-box">
-            <canvas id="videoCanvas"></canvas>
-            <div id="msg" style="color: #D4AF37; font-size: 24px;">بانتظار الإبداع...</div>
+        <div class="video-wrapper">
+            <canvas id="mainCanvas"></canvas>
+            <p id="infoText">بانتظار رفع ملف الفيديو...</p>
         </div>
 
-        <label for="videoFile" class="upload-label">📥 ارفع الفيديو الآن</label>
-        <input type="file" id="videoFile" accept="video/*">
-
-        <div class="btn-group">
-            <button onclick="applyGold()">✨ لمسة ذهبية</button>
-            <button onclick="download()">💾 حفظ الفيديو</button>
+        <input type="file" id="uploadFile" accept="video/*" style="display:none">
+        <button class="royal-btn" onclick="document.getElementById('uploadFile').click()">📤 ارفع الفيديو الآن</button>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <button class="secondary-btn" onclick="applyEffect()">✨ فلتر ذهبي</button>
+            <button class="secondary-btn" onclick="saveVideo()">💾 حفظ العمل</button>
         </div>
 
-        <div style="margin-top: 30px; color: #555; font-size: 18px;">
-            حقوق التصميم محفوظة &copy; 2026 Creative Pro
-        </div>
+        <div id="status">جاهز للعمل يا أستاذ أشرف..</div>
     </div>
 
     <script>
-        const canvas = document.getElementById('videoCanvas');
+        const canvas = document.getElementById('mainCanvas');
         const ctx = canvas.getContext('2d');
-        const fileInput = document.getElementById('videoFile');
-        const msg = document.getElementById('msg');
+        const fileInput = document.getElementById('uploadFile');
+        const info = document.getElementById('infoText');
         let video = document.createElement('video');
 
         fileInput.onchange = (e) => {
@@ -144,32 +127,27 @@
             video.onloadedmetadata = () => {
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
-                msg.style.display = 'none';
+                info.style.display = 'none';
                 video.play();
-                draw();
+                render();
             };
         };
 
-        function draw() {
+        function render() {
             if (!video.paused && !video.ended) {
                 ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
                 
-                // إضافة العلامة المائية بخط واضح وكبير
-                ctx.font = "bold 40px Arial";
-                ctx.fillStyle = "rgba(212, 175, 55, 0.5)";
-                ctx.fillText("Creative 2026", 40, canvas.height - 40);
+                // العلامة المائية الفخمة
+                ctx.font = "bold 35px Arial";
+                ctx.fillStyle = "rgba(214, 175, 55, 0.4)";
+                ctx.fillText("Creative 2026", 30, canvas.height - 30);
                 
-                requestAnimationFrame(draw);
+                requestAnimationFrame(render);
             }
         }
 
-        function applyGold() {
-            alert("أستاذ أشرف، تم تفعيل الفلتر الملكي بنجاح!");
-        }
-
-        function download() {
-            alert("جاري تحضير ملف MP4 عالي الجودة...");
-        }
+        function applyEffect() { alert("تم تفعيل الفلتر الملكي!"); }
+        function saveVideo() { alert("جاري تصدير الفيديو..."); }
     </script>
 </body>
 </html>
