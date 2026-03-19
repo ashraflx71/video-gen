@@ -3,105 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creative 2026 | Studio</title>
+    <title>Creative 2026 | Video Gen</title>
     <style>
-        :root { --gold: #D4AF37; --black: #050505; }
-        body { background: #000; color: var(--gold); font-family: Arial; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        :root { --gold: #D4AF37; --black: #0a0a0a; }
+        body { background: #000; color: var(--gold); font-family: 'Segoe UI', sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
         
-        .main-card { width: 100%; max-width: 600px; border: 2px solid var(--gold); border-radius: 20px; padding: 20px; background: var(--black); position: relative; }
+        .main-card { width: 100%; max-width: 600px; border: 2px solid var(--gold); border-radius: 20px; padding: 20px; background: var(--black); position: relative; overflow: hidden; }
         
-        /* مكان النص */
-        textarea { width: 100%; height: 120px; background: #111; color: #fff; border: 1px solid var(--gold); border-radius: 10px; font-size: 20px; padding: 10px; box-sizing: border-box; }
+        /* صندوق النص */
+        textarea { width: 100%; height: 100px; background: #111; color: #fff; border: 1px solid var(--gold); border-radius: 10px; font-size: 20px; padding: 10px; box-sizing: border-box; margin-bottom: 15px; }
 
-        /* شاشة الفيديو */
-        .preview { width: 100%; aspect-ratio: 16/9; background: #000; border: 1px solid #333; margin: 15px 0; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 10px; }
-        canvas { width: 100%; height: 100%; }
+        /* منطقة الفيديو */
+        .video-container { width: 100%; aspect-ratio: 16/9; background: #000; border: 1px solid #333; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; position: relative; border-radius: 12px; }
+        canvas { width: 100%; height: 100%; border-radius: 10px; }
 
         /* الأزرار */
-        .btn { background: var(--gold); color: #000; border: none; padding: 15px; width: 100%; font-size: 22px; font-weight: bold; border-radius: 10px; cursor: pointer; margin-bottom: 10px; }
-        .btn-out { background: transparent; color: var(--gold); border: 1px solid var(--gold); }
+        .btn { background: var(--gold); color: #000; border: none; padding: 18px; width: 100%; font-size: 22px; font-weight: bold; border-radius: 12px; cursor: pointer; margin-bottom: 10px; transition: 0.3s; }
+        .btn-out { background: transparent; color: var(--gold); border: 2px solid var(--gold); }
+        .btn:active { transform: scale(0.98); }
 
-        /* --- علامة التحميل (Loader) --- */
-        .loader-overlay {
-            display: none; /* مخفي افتراضياً */
+        /* --- شاشة التحميل الذكية --- */
+        #loader {
+            display: none; /* مخفي في البداية */
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); z-index: 10;
+            background: rgba(0, 0, 0, 0.85); z-index: 100;
             flex-direction: column; align-items: center; justify-content: center;
-            border-radius: 20px;
         }
         .spinner {
-            width: 50px; height: 50px;
-            border: 5px solid #333;
-            border-top: 5px solid var(--gold);
+            width: 60px; height: 60px;
+            border: 6px solid #222;
+            border-top: 6px solid var(--gold);
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .loading-text { margin-top: 15px; font-size: 20px; font-weight: bold; color: var(--gold); }
     </style>
 </head>
 <body>
 
     <div class="main-card">
-        <div id="loaderOverlay" class="loader-overlay">
+        <div id="loader">
             <div class="spinner"></div>
-            <p id="loaderMsg" style="margin-top:15px; font-weight:bold;">جاري المعالجة...</p>
+            <p class="loading-text" id="loaderTitle">جاري المعالجة...</p>
         </div>
 
         <h1 style="text-align:center; margin:0 0 15px 0;">CREATIVE 2026</h1>
         
-        <textarea id="scriptInput" placeholder="اكتب نص الفيديو هنا..."></textarea>
+        <textarea id="scriptInput" placeholder="اكتب هنا (إتيكيت غلط... أو أي نص)"></textarea>
 
-        <div class="preview">
-            <canvas id="c"></canvas>
-            <div id="pText" style="position:absolute;">المعاينة</div>
+        <div class="video-container">
+            <canvas id="vCanvas"></canvas>
+            <div id="placeholder" style="position:absolute; color:#444;">المعاينة من الجهاز</div>
         </div>
 
-        <input type="file" id="up" accept="video/*" style="display:none">
-        <button class="btn" onclick="document.getElementById('up').click()">📲 رفع فيديو</button>
+        <input type="file" id="fileIn" accept="video/*" style="display:none">
+        <button class="btn" onclick="document.getElementById('fileIn').click()">📲 اختر فيديو من هاتفك</button>
         
-        <button class="btn btn-out" onclick="showLoading('جاري توليد الذكاء...')">🎬 توليد بالذكاء</button>
-        <button class="btn btn-out" onclick="showLoading('جاري حفظ الفيديو...')">💾 حفظ النهائي</button>
+        <button class="btn btn-out" onclick="startProcess('جاري توليد الذكاء...')">🎬 معالجة بالذكاء</button>
+        <button class="btn btn-out" onclick="startProcess('جاري الحفظ النهائي...')">💾 حفظ الفيديو</button>
     </div>
 
     <script>
-        const canvas = document.getElementById('c');
+        const canvas = document.getElementById('vCanvas');
         const ctx = canvas.getContext('2d');
-        const up = document.getElementById('up');
+        const fileIn = document.getElementById('fileIn');
         let video = document.createElement('video');
 
-        up.onchange = (e) => {
+        // تشغيل الفيديو من الجهاز (الهاتف)
+        fileIn.onchange = (e) => {
             const file = e.target.files[0];
-            video.src = URL.createObjectURL(file);
-            video.onloadedmetadata = () => {
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                document.getElementById('pText').style.display = 'none';
-                video.play();
-                draw();
-            };
+            if (file) {
+                video.src = URL.createObjectURL(file);
+                video.onloadedmetadata = () => {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    document.getElementById('placeholder').style.display = 'none';
+                    video.play();
+                    drawFrame();
+                };
+            }
         };
 
-        function draw() {
+        function drawFrame() {
             if (!video.paused && !video.ended) {
                 ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                ctx.font = "25px Arial";
-                ctx.fillStyle = "rgba(212,175,55,0.5)";
+                // إضافة العلامة المائية الملكية
+                ctx.font = "bold 30px Arial";
+                ctx.fillStyle = "rgba(212, 175, 55, 0.4)";
                 ctx.fillText("Creative 2026", 20, canvas.height - 20);
-                requestAnimationFrame(draw);
+                requestAnimationFrame(drawFrame);
             }
         }
 
-        // دالة إظهار التحميل
-        function showLoading(msg) {
-            const overlay = document.getElementById('loaderOverlay');
-            document.getElementById('loaderMsg').innerText = msg;
-            overlay.style.display = 'flex';
+        // دالة تشغيل شاشة التحميل
+        function startProcess(msg) {
+            const loader = document.getElementById('loader');
+            const loaderTitle = document.getElementById('loaderTitle');
             
-            // محاكاة انتهاء العملية بعد 3 ثواني
+            loaderTitle.innerText = msg;
+            loader.style.display = 'flex'; // إظهار التحميل
+
+            // محاكاة انتهاء المعالجة بعد 4 ثوانٍ
             setTimeout(() => {
-                overlay.style.display = 'none';
-                alert("اكتملت العملية بنجاح!");
-            }, 3000);
+                loader.style.display = 'none'; // إخفاء التحميل
+                alert("أستاذ أشرف، تمت العملية بنجاح!");
+            }, 4000);
         }
     </script>
 </body>
