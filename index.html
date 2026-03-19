@@ -3,100 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creative 2026 | YouTube & Studio</title>
+    <title>Creative 2026 | Studio GitHub</title>
     <style>
         :root { --gold: #D4AF37; --black: #000; }
-        body { background: var(--black); color: var(--gold); font-family: Arial; margin: 0; padding: 15px; text-align: center; }
-        .main-card { max-width: 500px; margin: auto; border: 2px solid var(--gold); border-radius: 20px; padding: 20px; background: #050505; }
+        body { background: var(--black); color: var(--gold); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 15px; text-align: center; }
         
-        /* شريط جلب اليوتيوب */
-        .yt-box { display: flex; gap: 5px; margin-bottom: 20px; }
-        .yt-input { flex: 1; background: #111; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 8px; outline: none; }
-        .yt-btn { background: #f00; color: #fff; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .main-card { max-width: 600px; margin: auto; border: 2px solid var(--gold); border-radius: 20px; padding: 25px; background: #080808; box-shadow: 0 0 30px rgba(212, 175, 55, 0.15); }
 
-        /* منطقة النص والزرار */
-        textarea { width: 100%; height: 70px; background: #111; color: #fff; border: 1px solid var(--gold); border-radius: 10px; padding: 10px; box-sizing: border-box; }
-        .action-btn { background: var(--gold); color: #000; border: none; padding: 12px; width: 100%; margin: 10px 0; border-radius: 10px; font-weight: bold; font-size: 18px; cursor: pointer; }
+        /* شريط البحث عن فيديوهات يوتيوب */
+        .search-area { display: flex; gap: 8px; margin-bottom: 20px; }
+        .search-input { flex: 1; background: #151515; border: 1px solid #333; color: #fff; padding: 12px; border-radius: 10px; font-size: 16px; outline: none; }
+        .search-btn { background: var(--gold); color: #000; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .search-btn:hover { background: #fff; }
 
-        /* منطقة العرض الذكية */
-        .display-wrap { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 12px; overflow: hidden; position: relative; border: 1px solid #222; }
-        #ytFrame { width: 100%; height: 100%; display: none; border: none; }
-        #localVid { width: 100%; height: 100%; display: none; }
+        /* منطقة النص */
+        textarea { width: 100%; height: 90px; background: #111; color: #fff; border: 1px solid var(--gold); border-radius: 12px; padding: 12px; box-sizing: border-box; font-size: 18px; margin-bottom: 15px; resize: none; }
+
+        /* حاوية العرض */
+        .preview-box { width: 100%; aspect-ratio: 16/9; background: #000; border: 1px solid #222; border-radius: 15px; overflow: hidden; position: relative; }
+        iframe { width: 100%; height: 100%; border: none; display: none; }
+        video { width: 100%; height: 100%; object-fit: contain; display: none; }
         
-        /* النص الذهبي */
-        #caption { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.8); color: var(--gold); padding: 10px 0; font-size: 22px; font-weight: bold; display: none; z-index: 10; pointer-events: none; }
+        /* النص المتحرك فوق الفيديو */
+        #captionOverlay { 
+            position: absolute; bottom: 0; left: 0; width: 100%; 
+            background: rgba(0,0,0,0.75); color: var(--gold); 
+            padding: 15px 0; font-size: 22px; font-weight: bold; 
+            display: none; z-index: 10; pointer-events: none;
+        }
+
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        .btn-action { background: transparent; color: var(--gold); border: 1px solid var(--gold); padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        .btn-gold { background: var(--gold); color: #000; }
     </style>
 </head>
 <body>
 
     <div class="main-card">
-        <h2>Creative 2026 Studio</h2>
-
-        <div class="yt-box">
-            <input type="text" id="ytUrl" class="yt-input" placeholder="ضع رابط فيديو يوتيوب هنا...">
-            <button class="yt-btn" onclick="fetchYT()">جلب 📺</button>
+        <h1 style="margin-top: 0; font-size: 32px;">CREATIVE 2026</h1>
+        
+        <div class="search-area">
+            <input type="text" id="ytUrl" class="search-input" placeholder="أدخل رابط فيديو يوتيوب هنا...">
+            <button class="search-btn" onclick="loadYouTube()">جلب 🔍</button>
         </div>
 
-        <textarea id="msgIn" placeholder="اكتب النص الذي تريد ظهوره..."></textarea>
-        <button class="action-btn" onclick="applyText()">تطبيق النص على المعاينة ✍️</button>
+        <textarea id="userText" placeholder="اكتب النص الملكي الذي سيظهر فوق الفيديو..."></textarea>
 
-        <div class="display-wrap">
-            <iframe id="ytFrame" allow="autoplay"></iframe>
-            <video id="localVid" controls playsinline></video>
-            <div id="caption"></div>
-            <p id="waitMsg" style="color:#444; margin-top:15%;">بانتظار الفيديو...</p>
+        <div class="preview-box">
+            <iframe id="ytIframe" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            <video id="localVideo" controls playsinline></video>
+            <div id="captionOverlay"></div>
+            <div id="placeholder" style="margin-top: 15%; color: #333;">بانتظار اختيار المحتوى...</div>
         </div>
 
-        <input type="file" id="fIn" accept="video/*" style="display:none">
-        <button class="action-btn" style="background:none; border:1px solid var(--gold); color:var(--gold);" onclick="document.getElementById('fIn').click()">📲 أو ارفع فيديو من هاتفك</button>
+        <div class="btn-group">
+            <button class="btn-action btn-gold" onclick="applyCaption()">تطبيق النص ✍️</button>
+            <input type="file" id="fileIn" accept="video/*" style="display:none">
+            <button class="btn-action" onclick="document.getElementById('fileIn').click()">رفع محلي 📲</button>
+        </div>
+        
+        <p style="font-size: 12px; color: #444; margin-top: 20px;">الاستوديو الرسمي - م/ أشرف حسن علي</p>
     </div>
 
     <script>
-        const ytFrame = document.getElementById('ytFrame');
-        const localVid = document.getElementById('localVid');
-        const cap = document.getElementById('caption');
-        const waitMsg = document.getElementById('waitMsg');
+        const ytIframe = document.getElementById('ytIframe');
+        const localVideo = document.getElementById('localVideo');
+        const overlay = document.getElementById('captionOverlay');
+        const placeholder = document.getElementById('placeholder');
 
-        // وظيفة جلب فيديو يوتيوب
-        function fetchYT() {
+        // دالة جلب يوتيوب (تعمل بدون خادم)
+        function loadYouTube() {
             const url = document.getElementById('ytUrl').value;
-            const videoId = extractId(url);
+            const videoId = getID(url);
             if (videoId) {
-                localVid.style.display = "none";
-                ytFrame.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
-                ytFrame.style.display = "block";
-                waitMsg.style.display = "none";
-                cap.style.display = "block";
+                localVideo.style.display = "none";
+                placeholder.style.display = "none";
+                ytIframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+                ytIframe.style.display = "block";
+                overlay.style.display = "block";
+                applyCaption();
             } else {
-                alert("يا هندسة، الرابط غير صحيح، يرجى التأكد منه.");
+                alert("عذراً هندسة، الرابط غير صحيح. تأكد من نسخ رابط فيديو يوتيوب.");
             }
         }
 
-        // وظيفة استخراج الـ ID من الرابط
-        function extractId(url) {
+        function getID(url) {
             const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
             const match = url.match(regExp);
             return (match && match[2].length == 11) ? match[2] : false;
         }
 
-        function applyText() {
-            const val = document.getElementById('msgIn').value;
-            if(val) {
-                cap.innerText = val;
-                cap.style.display = "block";
+        function applyCaption() {
+            const text = document.getElementById('userText').value;
+            if (text) {
+                overlay.innerText = text;
+                overlay.style.display = "block";
             }
         }
 
-        // رفع محلي
-        document.getElementById('fIn').onchange = function(e) {
+        // الرفع من الجهاز
+        document.getElementById('fileIn').onchange = function(e) {
             const file = e.target.files[0];
             if (file) {
-                ytFrame.style.display = "none";
-                localVid.src = URL.createObjectURL(file);
-                localVid.style.display = "block";
-                waitMsg.style.display = "none";
-                cap.style.display = "block";
-                localVid.play();
+                ytIframe.style.display = "none";
+                placeholder.style.display = "none";
+                localVideo.src = URL.createObjectURL(file);
+                localVideo.style.display = "block";
+                overlay.style.display = "block";
+                localVideo.play();
+                applyCaption();
             }
         };
     </script>
