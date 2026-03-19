@@ -2,85 +2,127 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creative 2026 | Safe Mode</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Creative 2026 | Official Studio</title>
     <style>
         :root { --gold: #D4AF37; --black: #000; }
-        body { background: var(--black); color: var(--gold); font-family: Arial, sans-serif; margin: 0; padding: 15px; text-align: center; }
+        body { 
+            background: var(--black); color: var(--gold); 
+            font-family: 'Arial', sans-serif; margin: 0; padding: 10px;
+            display: flex; flex-direction: column; align-items: center;
+        }
         
-        .studio-box { width: 100%; max-width: 500px; border: 2px solid var(--gold); border-radius: 20px; padding: 20px; background: #050505; position: relative; margin: auto; }
-
-        /* منطقة النص */
-        #inputTxt { width: 100%; height: 80px; background: #111; color: #fff; border: 1px solid var(--gold); border-radius: 10px; font-size: 20px; padding: 10px; margin-bottom: 15px; }
-
-        /* حاوية الفيديو البديلة */
-        .video-container { 
-            width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 12px; 
-            overflow: hidden; position: relative; border: 1px solid #333;
+        .main-card { 
+            width: 100%; max-width: 500px; border: 3px solid var(--gold); 
+            border-radius: 20px; padding: 15px; background: #0a0a0a; 
+            box-sizing: border-box; box-shadow: 0 0 30px rgba(212,175,55,0.3);
         }
-        video { width: 100%; height: 100%; object-fit: contain; }
 
-        /* الطبقة الذهبية فوق الفيديو (بديلة الكنفا) */
-        .overlay-layer {
+        h1 { font-size: 28px; text-align: center; margin: 10px 0; text-shadow: 1px 1px #000; }
+
+        /* منطقة النص - كبيرة جداً وواضحة */
+        textarea { 
+            width: 100%; height: 100px; background: #111; color: #fff; 
+            border: 1px solid var(--gold); border-radius: 12px; font-size: 22px; 
+            padding: 12px; box-sizing: border-box; margin-bottom: 15px; text-align: right;
+        }
+
+        /* حاوية الفيديو المضمونة */
+        #videoContainer {
+            width: 100%; aspect-ratio: 16/9; background: #000; 
+            border-radius: 12px; position: relative; overflow: hidden;
+            border: 1px solid #333; display: flex; justify-content: center; align-items: center;
+        }
+
+        video { width: 100%; height: 100%; display: none; object-fit: contain; }
+
+        /* طبقة المعلومات فوق الفيديو */
+        #overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; /* عشان تقدر تلمس الفيديو تحتها */
-            display: flex; flex-direction: column; justify-content: space-between;
-            padding: 15px; box-sizing: border-box;
+            pointer-events: none; display: none; flex-direction: column;
+            justify-content: space-between; padding: 15px; box-sizing: border-box;
         }
 
-        .watermark { text-align: left; font-size: 18px; opacity: 0.5; font-weight: bold; }
-        .subtitle-box { 
-            background: rgba(0,0,0,0.6); color: var(--gold); 
-            padding: 10px; border-radius: 8px; font-size: 22px; font-weight: bold;
+        .watermark { font-size: 18px; opacity: 0.6; font-weight: bold; text-align: left; }
+        
+        #subDisplay { 
+            background: rgba(0,0,0,0.7); color: var(--gold); 
+            padding: 12px; border-radius: 10px; font-size: 24px; 
+            font-weight: bold; text-align: center; border: 1px solid var(--gold);
         }
 
-        .btn { background: var(--gold); color: #000; border: none; padding: 18px; width: 100%; font-size: 22px; font-weight: bold; border-radius: 12px; margin-top: 15px; cursor: pointer; }
+        /* الأزرار الكبيرة جداً للموبايل */
+        .btn { 
+            background: var(--gold); color: #000; border: none; padding: 20px; 
+            width: 100%; font-size: 24px; font-weight: bold; border-radius: 15px; 
+            margin-top: 15px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        .btn-secondary { background: transparent; color: var(--gold); border: 2px solid var(--gold); }
     </style>
 </head>
 <body>
 
-    <div class="studio-box">
-        <h1 style="font-size: 28px;">CREATIVE 2026</h1>
-        
-        <textarea id="inputTxt" oninput="updateText()" placeholder="اكتب نص الإتيكيت هنا..."></textarea>
+    <div class="main-card">
+        <h1>CREATIVE 2026</h1>
 
-        <div class="video-container">
-            <video id="mainVideo" playsinline muted loop></video>
+        <textarea id="textIn" oninput="syncText()" placeholder="اكتب نص الفيديو هنا..."></textarea>
+
+        <div id="videoContainer">
+            <video id="myVideo" playsinline webkit-playsinline muted loop></video>
+            <div id="status">بانتظار فيديو الهاتف...</div>
             
-            <div class="overlay-layer">
+            <div id="overlay">
                 <div class="watermark">Creative 2026</div>
-                <div id="displaySub" class="subtitle-box" style="display:none;"></div>
+                <div id="subDisplay"></div>
             </div>
         </div>
 
         <input type="file" id="fileIn" accept="video/*" style="display:none">
-        <button class="btn" onclick="document.getElementById('fileIn').click()">📲 ارفع فيديو من هاتفك</button>
+        <button class="btn" onclick="document.getElementById('fileIn').click()">📲 اختر فيديو من الاستوديو</button>
         
-        <button class="btn" style="background:transparent; color:var(--gold); border:1px solid var(--gold);" onclick="alert('جاري المعالجة النهائية...')">🎬 حفظ العمل</button>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn btn-secondary" onclick="alert('جاري التوليد...')">🎬 توليد</button>
+            <button class="btn btn-secondary" style="background:var(--gold); color:#000;" onclick="alert('جاري الحفظ...')">💾 حفظ</button>
+        </div>
     </div>
 
     <script>
-        const video = document.getElementById('mainVideo');
+        const video = document.getElementById('myVideo');
         const fileIn = document.getElementById('fileIn');
-        const displaySub = document.getElementById('displaySub');
-        const inputTxt = document.getElementById('inputTxt');
+        const overlay = document.getElementById('overlay');
+        const subDisplay = document.getElementById('subDisplay');
+        const textIn = document.getElementById('textIn');
+        const status = document.getElementById('status');
 
-        fileIn.onchange = (e) => {
+        fileIn.onchange = function(e) {
             const file = e.target.files[0];
             if (file) {
-                video.src = URL.createObjectURL(file);
-                video.play();
-                updateText();
+                const url = URL.createObjectURL(file);
+                video.src = url;
+                
+                // التأكد من التشغيل بقوة
+                video.style.display = "block";
+                status.style.display = "none";
+                overlay.style.display = "flex";
+                
+                video.load();
+                video.play().catch(function(error) {
+                    console.log("التشغيل التلقائي يحتاج لمسة");
+                    video.muted = true;
+                    video.play();
+                });
+                syncText();
             }
         };
 
-        function updateText() {
-            const val = inputTxt.value;
+        function syncText() {
+            const val = textIn.value;
             if (val.trim() !== "") {
-                displaySub.innerText = val;
-                displaySub.style.display = "block";
+                subDisplay.innerText = val;
+                subDisplay.style.visibility = "visible";
             } else {
-                displaySub.style.display = "none";
+                subDisplay.style.visibility = "hidden";
             }
         }
     </script>
