@@ -1,0 +1,36 @@
+import json
+
+def create_etiquette_video_script(topic, wrong_behavior, correct_behavior):
+    """
+    هذه الدالة تجهز البيانات ليتم إرسالها لمحرك MoviePy 
+    أو نظام التوليد الخاص بك.
+    """
+    video_data = {
+        "title": f"إتيكيت: {topic}",
+        "scenes": [
+            {
+                "time": "00:00 - 00:05",
+                "type": "Wrong",
+                "text": f"الخطأ: {wrong_behavior}",
+                "visual_prompt": f"Cinematic shot, someone {wrong_behavior}, dark lighting, red tint",
+                "audio": f"كثير منا يرتكب هذا الخطأ: {wrong_behavior}"
+            },
+            {
+                "time": "00:05 - 00:10",
+                "type": "Correct",
+                "text": f"الصح: {correct_behavior}",
+                "visual_prompt": f"Cinematic shot, someone {correct_behavior}, bright professional lighting, golden accents",
+                "audio": f"التصرف الصحيح والراقي هو: {correct_behavior}"
+            }
+        ],
+        "branding": "Creative 2026"
+    }
+    return json.dumps(video_data, ensure_ascii=False, indent=4)
+
+# مثال للاستخدام:
+topic = "شرب القهوة"
+wrong = "النفخ في القهوة الساخنة لتبريدها"
+correct = "الانتظار حتى تبرد أو تحريكها بملعقة بهدوء"
+
+script = create_etiquette_video_script(topic, wrong, correct)
+print(script)
