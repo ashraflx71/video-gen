@@ -3,125 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creative 2026 | Official Studio</title>
+    <title>Creative 2026 | Safe Mode</title>
     <style>
-        :root { --gold: #D4AF37; --black: #000; --bg: #0a0a0a; }
-        body { background: var(--black); color: var(--gold); font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        :root { --gold: #D4AF37; --black: #000; }
+        body { background: var(--black); color: var(--gold); font-family: Arial, sans-serif; margin: 0; padding: 15px; text-align: center; }
         
-        .main-card { width: 100%; max-width: 700px; border: 3px solid var(--gold); border-radius: 25px; padding: 25px; background: var(--bg); position: relative; box-shadow: 0 0 50px rgba(212, 175, 55, 0.2); }
-        
-        h1 { text-align: center; font-size: 40px; margin: 0 0 20px 0; text-shadow: 2px 2px #000; letter-spacing: 2px; }
+        .studio-box { width: 100%; max-width: 500px; border: 2px solid var(--gold); border-radius: 20px; padding: 20px; background: #050505; position: relative; margin: auto; }
 
-        /* منطقة النص الكبيرة */
-        textarea { width: 100%; height: 130px; background: #111; color: #fff; border: 2px solid var(--gold); border-radius: 15px; font-size: 24px; padding: 15px; box-sizing: border-box; margin-bottom: 20px; outline: none; }
+        /* منطقة النص */
+        #inputTxt { width: 100%; height: 80px; background: #111; color: #fff; border: 1px solid var(--gold); border-radius: 10px; font-size: 20px; padding: 10px; margin-bottom: 15px; }
 
-        /* حاوية الفيديو الذكية */
-        .video-box { width: 100%; aspect-ratio: 16/9; background: #000; border: 1px solid var(--gold); border-radius: 15px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-        canvas { width: 100%; height: 100%; object-fit: cover; }
-
-        /* أزرار الهاتف الملكية */
-        .btn { background: var(--gold); color: #000; border: none; padding: 20px; width: 100%; font-size: 26px; font-weight: bold; border-radius: 15px; cursor: pointer; margin-bottom: 12px; transition: 0.3s; }
-        .btn-out { background: transparent; color: var(--gold); border: 2px solid var(--gold); }
-        .btn:active { transform: scale(0.95); }
-
-        /* شاشة التحميل الذهبية */
-        #loader {
-            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); z-index: 100; flex-direction: column; align-items: center; justify-content: center;
+        /* حاوية الفيديو البديلة */
+        .video-container { 
+            width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 12px; 
+            overflow: hidden; position: relative; border: 1px solid #333;
         }
-        .spinner {
-            width: 70px; height: 70px; border: 5px solid #222; border-top: 5px solid var(--gold);
-            border-radius: 50%; animation: spin 1s linear infinite;
+        video { width: 100%; height: 100%; object-fit: contain; }
+
+        /* الطبقة الذهبية فوق الفيديو (بديلة الكنفا) */
+        .overlay-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; /* عشان تقدر تلمس الفيديو تحتها */
+            display: flex; flex-direction: column; justify-content: space-between;
+            padding: 15px; box-sizing: border-box;
         }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .loading-text { margin-top: 20px; font-size: 22px; font-weight: bold; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+
+        .watermark { text-align: left; font-size: 18px; opacity: 0.5; font-weight: bold; }
+        .subtitle-box { 
+            background: rgba(0,0,0,0.6); color: var(--gold); 
+            padding: 10px; border-radius: 8px; font-size: 22px; font-weight: bold;
+        }
+
+        .btn { background: var(--gold); color: #000; border: none; padding: 18px; width: 100%; font-size: 22px; font-weight: bold; border-radius: 12px; margin-top: 15px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="main-card">
-        <div id="loader">
-            <div class="spinner"></div>
-            <p class="loading-text" id="loaderMsg">جاري تشغيل محرك الإبداع...</p>
-        </div>
-
-        <h1>CREATIVE 2026</h1>
+    <div class="studio-box">
+        <h1 style="font-size: 28px;">CREATIVE 2026</h1>
         
-        <textarea id="userInput" placeholder="اكتب نص الفيديو هنا (مثلاً: إتيكيت المصافحة الراقي)..."></textarea>
+        <textarea id="inputTxt" oninput="updateText()" placeholder="اكتب نص الإتيكيت هنا..."></textarea>
 
-        <div class="video-box">
-            <canvas id="studioCanvas"></canvas>
-            <div id="hint" style="position:absolute; font-size:22px; color:#555;">المعاينة الرسمية</div>
+        <div class="video-container">
+            <video id="mainVideo" playsinline muted loop></video>
+            
+            <div class="overlay-layer">
+                <div class="watermark">Creative 2026</div>
+                <div id="displaySub" class="subtitle-box" style="display:none;"></div>
+            </div>
         </div>
 
-        <br>
-        <input type="file" id="phoneFile" accept="video/*" style="display:none">
-        <button class="btn" onclick="document.getElementById('phoneFile').click()">📲 اختيار فيديو من هاتفك</button>
+        <input type="file" id="fileIn" accept="video/*" style="display:none">
+        <button class="btn" onclick="document.getElementById('fileIn').click()">📲 ارفع فيديو من هاتفك</button>
         
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <button class="btn btn-out" onclick="runProcess('جاري دمج النص والذكاء...')">🎬 توليد نهائي</button>
-            <button class="btn btn-out" style="background:var(--gold); color:#000;" onclick="runProcess('جاري حفظ الملف الملكي...')">💾 حفظ الفيديو</button>
-        </div>
+        <button class="btn" style="background:transparent; color:var(--gold); border:1px solid var(--gold);" onclick="alert('جاري المعالجة النهائية...')">🎬 حفظ العمل</button>
     </div>
 
     <script>
-        const canvas = document.getElementById('studioCanvas');
-        const ctx = canvas.getContext('2d');
-        const phoneFile = document.getElementById('phoneFile');
-        const userInput = document.getElementById('userInput');
-        let video = document.createElement('video');
+        const video = document.getElementById('mainVideo');
+        const fileIn = document.getElementById('fileIn');
+        const displaySub = document.getElementById('displaySub');
+        const inputTxt = document.getElementById('inputTxt');
 
-        phoneFile.onchange = (e) => {
+        fileIn.onchange = (e) => {
             const file = e.target.files[0];
             if (file) {
                 video.src = URL.createObjectURL(file);
-                video.onloadedmetadata = () => {
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
-                    document.getElementById('hint').style.display = 'none';
-                    video.play();
-                    render();
-                };
+                video.play();
+                updateText();
             }
         };
 
-        function render() {
-            if (!video.paused && !video.ended) {
-                // رسم الفيديو
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                
-                // 1. إضافة العلامة المائية الثابتة
-                ctx.font = "bold 30px Arial";
-                ctx.fillStyle = "rgba(212, 175, 55, 0.4)";
-                ctx.fillText("Creative 2026", 30, 50);
-
-                // 2. إضافة النص الذي يكتبه الأستاذ أشرف (Subtitles)
-                const text = userInput.value;
-                if (text) {
-                    ctx.font = "bold 40px Arial";
-                    ctx.textAlign = "center";
-                    // خلفية سوداء خفيفة للنص لسهولة القراءة
-                    ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
-                    ctx.fillRect(0, canvas.height - 100, canvas.width, 100);
-                    // النص الذهبي
-                    ctx.fillStyle = "#D4AF37";
-                    ctx.fillText(text, canvas.width / 2, canvas.height - 40);
-                }
-                
-                requestAnimationFrame(render);
+        function updateText() {
+            const val = inputTxt.value;
+            if (val.trim() !== "") {
+                displaySub.innerText = val;
+                displaySub.style.display = "block";
+            } else {
+                displaySub.style.display = "none";
             }
-        }
-
-        function runProcess(msg) {
-            const loader = document.getElementById('loader');
-            document.getElementById('loaderMsg').innerText = msg;
-            loader.style.display = 'flex';
-            
-            setTimeout(() => {
-                loader.style.display = 'none';
-                alert("أستاذ أشرف، تم التشغيل بنجاح وبأعلى جودة!");
-            }, 3500);
         }
     </script>
 </body>
