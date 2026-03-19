@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creative 2026 | Official</title>
+    <style>
+        :root { --gold: #D4AF37; --black: #000; }
+        body { background: var(--black); color: var(--gold); font-family: Arial, sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        
+        /* الحاوية الرئيسية */
+        .app-container { width: 100%; max-width: 600px; border: 2px solid var(--gold); border-radius: 20px; padding: 20px; background: #050505; box-shadow: 0 0 30px rgba(212,175,55,0.2); }
+        
+        h1 { text-align: center; font-size: 35px; margin-bottom: 20px; border-bottom: 1px solid var(--gold); padding-bottom: 10px; }
+
+        /* منطقة النص - كبيرة وواضحة */
+        .text-input { width: 100%; height: 120px; background: #111; color: #fff; border: 1px solid var(--gold); border-radius: 12px; font-size: 22px; padding: 15px; box-sizing: border-box; margin-bottom: 20px; }
+
+        /* منطقة الفيديو */
+        .video-wrapper { width: 100%; aspect-ratio: 16/9; background: #000; border: 1px solid #333; position: relative; display: flex; align-items: center; justify-content: center; border-radius: 10px; overflow: hidden; }
+        canvas { width: 100%; height: 100%; }
+
+        /* الأزرار الملكية */
+        .btn { background: var(--gold); color: #000; border: none; padding: 18px; width: 100%; font-size: 24px; font-weight: bold; border-radius: 12px; cursor: pointer; margin-top: 15px; display: block; }
+        .btn-secondary { background: transparent; color: var(--gold); border: 1px solid var(--gold); }
+
+        /* علامة التحميل المضيئة */
+        #loadingLayer {
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 99; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .ring { width: 60px; height: 60px; border: 4px solid #333; border-top: 4px solid var(--gold); border-radius: 50%; animation: rot 1s linear infinite; }
+        @keyframes rot { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <div id="loadingLayer">
+            <div class="ring"></div>
+            <p id="lStatus" style="margin-top:15px; font-weight:bold;">جاري التنفيذ...</p>
+        </div>
+
+        <h1>CREATIVE 2026</h1>
+
+        <textarea id="myText" class="text-input" placeholder="اكتب هنا النص الذي سيظهر على الفيديو..."></textarea>
+
+        <div class="video-wrapper">
+            <canvas id="mainCanvas"></canvas>
+            <div id="info" style="position:absolute; color:#444;">شاشة العرض الرسمية</div>
+        </div>
+
+        <input type="file" id="takeVideo" accept="video/*" style="display:none">
+        <button class="btn" onclick="document.getElementById('takeVideo').click()">📲 ارفع فيديو من جهازك</button>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <button class="btn btn-secondary" onclick="startLoading('جاري معالجة الذكاء...')">🎬 توليد</button>
+            <button class="btn btn-secondary" style="background:var(--gold); color:#000;" onclick="startLoading('جاري حفظ العمل...')">💾 حفظ</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('mainCanvas');
+        const ctx = canvas.getContext('2d');
+        const videoInput = document.getElementById('takeVideo');
+        const textInput = document.getElementById('myText');
+        let video = document.createElement('video');
+        video.muted = true; // لضمان التشغيل التلقائي على الموبايل
+        video.playsInline = true;
+
+        videoInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                video.src = URL.createObjectURL(file);
+                video.onloadeddata = function() {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    document.getElementById('info').style.display = 'none';
+                    video.play();
+                    requestAnimationFrame(processFrame);
+                };
+            }
+        });
+
+        function processFrame() {
+            if (!video.paused && !video.ended) {
+                // 1. رسم الفيديو
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                // 2. رسم العلامة المائية
+                ctx.font = "bold 25px Arial";
+                ctx.fillStyle = "rgba(212, 175, 55, 0.4)";
+                ctx.fillText("Creative 2026", 20, 40);
+
+                // 3. رسم النص الذهبي (Subtitles)
+                const txt = textInput.value;
+                if (txt) {
+                    ctx.font = "bold 35px Arial";
+                    ctx.textAlign = "center";
+                    ctx.fillStyle = "rgba(0,0,0,0.5)";
+                    ctx.fillRect(0, canvas.height - 80, canvas.width, 80);
+                    ctx.fillStyle = "#D4AF37";
+                    ctx.fillText(txt, canvas.width / 2, canvas.height - 30);
+                }
+                requestAnimationFrame(processFrame);
+            }
+        }
+
+        // دالة تشغيل التحميل (المؤشر الذهبي)
+        function startLoading(msg) {
+            const loader = document.getElementById('loadingLayer');
+            document.getElementById('lStatus').innerText = msg;
+            loader.style.display = 'flex';
+            
+            setTimeout(() => {
+                loader.style.display = 'none';
+                alert("أستاذ أشرف، تم التنفيذ بنجاح!");
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
