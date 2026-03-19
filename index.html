@@ -3,42 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creative 2026 | Light Studio</title>
+    <title>Creative 2026 | Studio</title>
     <style>
-        /* تنسيق الأستاذ أشرف: أسود وذهبي فخم */
-        body { background: #000; color: #D4AF37; font-family: sans-serif; text-align: center; padding: 10px; }
-        .card { border: 2px solid #D4AF37; border-radius: 15px; padding: 15px; background: #050505; max-width: 500px; margin: auto; }
+        body { background: #000; color: #D4AF37; font-family: sans-serif; text-align: center; margin: 0; padding: 20px; }
+        .container { max-width: 500px; margin: auto; border: 2px solid #D4AF37; padding: 20px; border-radius: 20px; background: #050505; }
         
-        /* صندوق النص */
-        textarea { width: 100%; height: 70px; font-size: 20px; margin-bottom: 10px; border-radius: 8px; background: #111; color: #fff; border: 1px solid #D4AF37; padding: 10px; box-sizing: border-box; }
-
-        /* منطقة العرض (الفيديو فوقه النص) */
-        .viewer { width: 100%; aspect-ratio: 16/9; background: #000; position: relative; border-radius: 10px; overflow: hidden; border: 1px solid #222; }
-        video { width: 100%; height: 100%; object-fit: contain; background: #000; }
+        /* منطقة الفيديو */
+        #videoArea { 
+            width: 100%; aspect-ratio: 16/9; background: #111; 
+            margin: 20px 0; border-radius: 10px; position: relative; 
+            border: 1px solid #333; display: flex; align-items: center; justify-content: center;
+        }
+        video { width: 100%; height: 100%; border-radius: 10px; display: none; }
         
-        /* النص الذهبي */
-        #sub { position: absolute; bottom: 10px; left: 5%; width: 90%; background: rgba(0,0,0,0.7); padding: 8px; font-size: 22px; font-weight: bold; border-radius: 5px; display: none; }
+        /* النص */
+        #sub { position: absolute; bottom: 10px; width: 90%; background: rgba(0,0,0,0.8); padding: 10px; font-size: 22px; font-weight: bold; border-radius: 5px; display: none; }
+        textarea { width: 100%; height: 60px; font-size: 18px; margin-bottom: 10px; background: #111; color: #fff; border: 1px solid #D4AF37; border-radius: 8px; padding: 10px; box-sizing: border-box; }
 
-        .btn { background: #D4AF37; color: #000; padding: 15px; width: 100%; font-size: 22px; font-weight: bold; border-radius: 12px; margin-top: 10px; border: none; cursor: pointer; }
+        .btn { background: #D4AF37; color: #000; padding: 15px; width: 100%; font-size: 20px; font-weight: bold; border-radius: 12px; border: none; cursor: pointer; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h2 style="margin-top:0;">Creative 2026</h2>
-        
-        <textarea id="inp" oninput="showTxt()" placeholder="اكتب النص هنا..."></textarea>
+    <div class="container">
+        <h2>CREATIVE 2026</h2>
+        <p style="color: #666; font-size: 14px;">نسخة الفحص التقني - أستاذ أشرف</p>
 
-        <div class="viewer">
+        <textarea id="inp" placeholder="اكتب النص هنا..." oninput="updateText()"></textarea>
+
+        <div id="videoArea">
             <video id="v" playsinline webkit-playsinline muted loop></video>
             <div id="sub"></div>
-            <p id="msg" style="position:absolute; color:#444;">ارفع الفيديو من هاتفك</p>
+            <p id="placeholder">اضغط على "اختر فيديو" للبدء</p>
         </div>
 
         <input type="file" id="f" accept="video/*" style="display:none">
-        <button class="btn" onclick="document.getElementById('f').click()">📂 اختر فيديو</button>
+        <button class="btn" onclick="document.getElementById('f').click()">📂 اختر فيديو من الهاتف</button>
         
-        <button class="btn" style="background:none; border:1px solid #D4AF37; color:#D4AF37;" onclick="v.play()">▶ تشغيل</button>
+        <button class="btn" style="background:none; border: 1px solid #D4AF37; color: #D4AF37;" onclick="forcePlay()">▶ تشغيل / تحديث</button>
     </div>
 
     <script>
@@ -46,25 +48,30 @@
         const f = document.getElementById('f');
         const s = document.getElementById('sub');
         const t = document.getElementById('inp');
-        const m = document.getElementById('msg');
+        const p = document.getElementById('placeholder');
 
         f.onchange = function(e) {
             const file = e.target.files[0];
-            if(file) {
-                const url = URL.createObjectURL(file);
-                v.src = url;
-                v.style.display = "block";
-                m.style.display = "none";
-                s.style.display = "block";
-                v.play().catch(() => {
-                    alert("اضغط على 'تشغيل' لعرض الفيديو");
-                });
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    v.src = event.target.result;
+                    v.style.display = "block";
+                    p.style.display = "none";
+                    s.style.display = "block";
+                    v.play();
+                };
+                reader.readAsDataURL(file); // قراءة الملف كبيانات مباشرة لتجاوز حماية المتصفح
             }
         };
 
-        function showTxt() {
+        function updateText() {
             s.innerText = t.value;
-            s.style.display = t.value ? "block" : "none";
+        }
+
+        function forcePlay() {
+            v.play();
+            updateText();
         }
     </script>
 </body>
