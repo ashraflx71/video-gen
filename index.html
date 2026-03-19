@@ -1,166 +1,36 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creative 2026 | Video Gen Pro</title>
-    <style>
-        :root {
-            --gold: #D4AF37;
-            --dark-gold: #996515;
-            --black: #0a0a0a;
-            --glass: rgba(255, 255, 255, 0.1);
-        }
+import json
 
-        body {
-            background-color: var(--black);
-            color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 900px;
-            border: 2px solid var(--gold);
-            border-radius: 15px;
-            padding: 30px;
-            background: linear-gradient(145deg, #1a1a1a, #000000);
-            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2);
-        }
-
-        h1 {
-            color: var(--gold);
-            text-align: center;
-            font-size: 32px; /* الخط الكبير والمريح */
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 30px;
-            border-bottom: 1px solid var(--gold);
-            padding-bottom: 10px;
-        }
-
-        .canvas-area {
-            width: 100%;
-            aspect-ratio: 16 / 9;
-            background: #000;
-            border: 1px solid var(--dark-gold);
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        canvas {
-            max-width: 100%;
-            max-height: 100%;
-        }
-
-        .controls {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            width: 100%;
-        }
-
-        button {
-            background: transparent;
-            color: var(--gold);
-            border: 1px solid var(--gold);
-            padding: 12px 20px;
-            font-size: 18px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border-radius: 5px;
-        }
-
-        button:hover {
-            background: var(--gold);
-            color: var(--black);
-            box-shadow: 0 0 15px var(--gold);
-        }
-
-        .upload-btn {
-            background: var(--gold);
-            color: var(--black);
-            font-weight: bold;
-        }
-
-        #status {
-            margin-top: 15px;
-            color: var(--gold);
-            font-size: 14px;
-            text-align: center;
-        }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <h1>CREATIVE 2026 - VIDEO GEN</h1>
-    
-    <div class="canvas-area" id="canvasContainer">
-        <canvas id="mainCanvas"></canvas>
-    </div>
-
-    <div class="controls">
-        <button class="upload-btn" onclick="document.getElementById('videoInput').click()">رفع فيديو</button>
-        <button onclick="startRecording()">بدء التسجيل</button>
-        <button onclick="stopRecording()">حفظ ومعالجة</button>
-        <button onclick="applyGoldFilter()">فلتر ذهبي</button>
-    </div>
-
-    <input type="file" id="videoInput" hidden accept="video/*">
-    <div id="status">جاهز للعمل..</div>
-</div>
-
-<script>
-    const canvas = document.getElementById('mainCanvas');
-    const ctx = canvas.getContext('2d');
-    const videoInput = document.getElementById('videoInput');
-    let videoElement = document.createElement('video');
-    let mediaRecorder;
-    let recordedChunks = [];
-
-    videoInput.onchange = function(e) {
-        const file = e.target.files[0];
-        const url = URL.createObjectURL(file);
-        videoElement.src = url;
-        videoElement.play();
-        drawVideo();
-    };
-
-    function drawVideo() {
-        if (!videoElement.paused && !videoElement.ended) {
-            canvas.width = videoElement.videoWidth;
-            canvas.height = videoElement.videoHeight;
-            ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-            
-            // إضافة العلامة المائية "Creative 2026" بشكل احترافي
-            ctx.font = "20px Arial";
-            ctx.fillStyle = "rgba(214, 175, 55, 0.5)";
-            ctx.fillText("Creative 2026", 20, canvas.height - 20);
-            
-            requestAnimationFrame(drawVideo);
-        }
+def create_etiquette_video_script(topic, wrong_behavior, correct_behavior):
+    """
+    هذه الدالة تجهز البيانات ليتم إرسالها لمحرك MoviePy 
+    أو نظام التوليد الخاص بك.
+    """
+    video_data = {
+        "title": f"إتيكيت: {topic}",
+        "scenes": [
+            {
+                "time": "00:00 - 00:05",
+                "type": "Wrong",
+                "text": f"الخطأ: {wrong_behavior}",
+                "visual_prompt": f"Cinematic shot, someone {wrong_behavior}, dark lighting, red tint",
+                "audio": f"كثير منا يرتكب هذا الخطأ: {wrong_behavior}"
+            },
+            {
+                "time": "00:05 - 00:10",
+                "type": "Correct",
+                "text": f"الصح: {correct_behavior}",
+                "visual_prompt": f"Cinematic shot, someone {correct_behavior}, bright professional lighting, golden accents",
+                "audio": f"التصرف الصحيح والراقي هو: {correct_behavior}"
+            }
+        ],
+        "branding": "Creative 2026"
     }
+    return json.dumps(video_data, ensure_ascii=False, indent=4)
 
-    function applyGoldFilter() {
-        // منطق بسيط لمحاكاة تأثير ذهبي على الفيديو
-        ctx.globalCompositeOperation = 'overlay';
-        ctx.fillStyle = 'rgba(212, 175, 55, 0.3)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        document.getElementById('status').innerText = "تم تطبيق الفلتر الملكي";
-    }
+# مثال للاستخدام:
+topic = "شرب القهوة"
+wrong = "النفخ في القهوة الساخنة لتبريدها"
+correct = "الانتظار حتى تبرد أو تحريكها بملعقة بهدوء"
 
-    // إضافة وظيفة التسجيل هنا لاحقاً للربط مع المحرك
-</script>
-
-</body>
-</html>
+script = create_etiquette_video_script(topic, wrong, correct)
+print(script)
