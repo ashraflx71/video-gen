@@ -3,103 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creative 2026 AI | الحل النهائي</title>
+    <title>Creative 2026 AI | استوديو الفيديو</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@700&display=swap" rel="stylesheet">
     <style>
         :root { --blue: #0000ff; --black: #000000; }
         body { background: var(--black); color: #fff; font-family: 'Tajawal', sans-serif; text-align: center; padding: 20px; font-size: 22px; margin: 0; }
-        .card { border: 2px solid var(--blue); border-radius: 15px; padding: 25px; background: #121212; max-width: 600px; margin: 20px auto; box-shadow: 0 0 20px rgba(0,0,255,0.4); }
+        .card { border: 2px solid var(--blue); border-radius: 15px; padding: 25px; background: #121212; max-width: 650px; margin: 20px auto; }
         .status { background: #000; color: #00ff00; padding: 12px; border-radius: 8px; margin: 15px 0; font-family: monospace; font-size: 18px; border: 1px solid #333; }
-        select { width: 100%; padding: 15px; border-radius: 10px; background: #000; color: #fff; border: 1px solid var(--blue); font-size: 20px; margin-bottom: 20px; font-family: 'Tajawal'; outline: none; }
-        .post-card { background: #1a1a1a; border: 1px solid #333; border-radius: 12px; margin-bottom: 25px; overflow: hidden; text-align: right; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        .post-thumb { width: 100%; height: 200px; background: linear-gradient(135deg, #000033 0%, #0000ff 100%); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 22px; font-weight: bold; text-align: center; padding: 20px; }
+        select { width: 100%; padding: 15px; border-radius: 10px; background: #000; color: #fff; border: 1px solid var(--blue); font-size: 20px; margin-bottom: 20px; font-family: 'Tajawal'; }
+        .post-card { background: #1a1a1a; border: 1px solid #333; border-radius: 12px; margin-bottom: 25px; overflow: hidden; text-align: right; }
         .post-content { padding: 20px; }
-        .post-title { color: #fff; text-decoration: none; font-size: 20px; display: block; margin-bottom: 10px; font-weight: bold; }
-        .btn { background: var(--blue); color: #fff; padding: 18px; border: none; border-radius: 10px; font-size: 22px; font-weight: bold; cursor: pointer; width: 100%; }
+        .post-title { color: #fff; text-decoration: none; font-size: 20px; display: block; margin-bottom: 15px; font-weight: bold; }
+        .btn-gen { background: var(--blue); color: #fff; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 18px; width: 100%; }
+        #renderCanvas { display: none; } /* المحرك يعمل في الخلفية */
+        .download-link { display: block; margin-top: 10px; color: #00ff00; text-decoration: none; font-size: 18px; }
     </style>
 </head>
 <body>
 
 <div class="card">
     <h1 style="color: var(--blue); margin: 0 0 10px 0;">Creative 2026 AI</h1>
-    <p style="font-size: 16px; color: #888; margin-bottom: 25px;">الإدارة المركزية - أشرف حسن</p>
+    <p style="font-size: 16px; color: #888;">استوديو توليد الفيديو - أشرف حسن</p>
     
     <select id="blogSelect">
         <option value="ashraf-creative.blogspot.com">Creative (الرئيسية)</option>
         <option value="ashrafhassan2026.blogspot.com">Ashraf Hassan 2026</option>
         <option value="www.sherifpro.com">Sherif Pro</option>
-        <option value="creative2026.blogspot.com">Creative 2026</option>
-        <option value="ashraf-demo1.blogspot.com">Ashraf Demo 1</option>
         <option value="optimum2026.blogspot.com">Optimum 2026</option>
-        <option value="ashraftt66.blogspot.com">منصة الاختبار</option>
     </select>
 
-    <div class="status" id="display">> جاهز للعمل...</div>
-    <button class="btn" id="mainBtn" onclick="loadBlogData()">سحب المقالات فوراً</button>
+    <div class="status" id="display">> المحرك جاهز للإنتاج...</div>
+    <button style="background:var(--blue); color:#fff; width:100%; padding:15px; border:none; border-radius:10px; font-size:20px; cursor:pointer;" onclick="loadBlogData()">عرض المقالات للتوليد</button>
 
     <div id="feed" style="margin-top:30px;"></div>
 </div>
 
+<canvas id="renderCanvas" width="720" height="1280"></canvas>
+
 <script>
 function loadBlogData() {
     const blogUrl = document.getElementById('blogSelect').value;
-    const display = document.getElementById('display');
-    const btn = document.getElementById('mainBtn');
-
-    btn.disabled = true;
-    display.innerText = "> جاري جلب البيانات بطريقة JSONP...";
-    display.style.color = "#00ff00";
-
-    // حذف أي سكريبت قديم لضمان التحديث
-    const oldScript = document.getElementById('bloggerScript');
-    if (oldScript) oldScript.remove();
-
-    // إنشاء سكريبت جديد لطلب البيانات وتجاوز CORS تماماً
     const script = document.createElement('script');
-    script.id = 'bloggerScript';
-    script.src = `https://${blogUrl}/feeds/posts/default?alt=json-in-script&callback=renderPosts&max-results=6`;
+    script.src = `https://${blogUrl}/feeds/posts/default?alt=json-in-script&callback=renderPosts&max-results=5`;
     document.body.appendChild(script);
 }
 
 function renderPosts(data) {
     const feed = document.getElementById('feed');
-    const display = document.getElementById('display');
-    const btn = document.getElementById('mainBtn');
-    
     feed.innerHTML = "";
-    display.innerText = "> تم تحديث المحتوى بنجاح!";
+    data.feed.entry.forEach((entry, index) => {
+        const title = entry.title.$t;
+        let imgSrc = entry.media$thumbnail ? entry.media$thumbnail.url.replace("s72-c", "s1600") : "";
+        
+        const card = document.createElement('div');
+        card.className = "post-card";
+        card.innerHTML = `
+            <div class="post-content">
+                <span class="post-title">${title}</span>
+                <button class="btn-gen" id="btn-${index}" onclick="generateVideo('${title}', '${imgSrc}', ${index})">صناعة فيديو Short لهذا المقال 🎬</button>
+                <div id="link-${index}"></div>
+            </div>
+        `;
+        feed.appendChild(card);
+    });
+}
 
-    const entries = data.feed.entry || [];
-    if (entries.length === 0) {
-        feed.innerHTML = "<p>لا توجد مقالات منشورة.</p>";
-    } else {
-        entries.forEach(entry => {
-            const title = entry.title.$t;
-            const link = entry.link.find(l => l.rel === 'alternate').href;
-            
-            let imgSrc = "";
-            if (entry.media$thumbnail) {
-                imgSrc = entry.media$thumbnail.url.replace("s72-c", "s1600");
-            }
+async function generateVideo(title, imgSrc, id) {
+    const canvas = document.getElementById('renderCanvas');
+    const ctx = canvas.getContext('2d');
+    const status = document.getElementById('display');
+    const btn = document.getElementById(`btn-${id}`);
+    
+    btn.disabled = true;
+    status.innerText = "> جاري رندرة الفيديو (Shorts)...";
 
-            const postCard = document.createElement('div');
-            postCard.className = "post-card";
-            
-            const thumbHTML = imgSrc 
-                ? `<img src="${imgSrc}" style="width:100%; height:200px; object-fit:cover;">`
-                : `<div class="post-thumb"><span>${title}</span></div>`;
+    // إعداد المسجل
+    const stream = canvas.captureStream(30);
+    const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+    const chunks = [];
+    recorder.ondataavailable = e => chunks.push(e.data);
+    recorder.onstop = () => {
+        const blob = new Blob(chunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        document.getElementById(`link-${id}`).innerHTML = `<a href="${url}" download="Ashraf_Video_${id}.webm" class="download-link">تحميل الفيديو الناتج 📥</a>`;
+        status.innerText = "> تم إنتاج الفيديو بنجاح!";
+        btn.disabled = false;
+    };
 
-            postCard.innerHTML = `
-                ${thumbHTML}
-                <div class="post-content">
-                    <a href="${link}" target="_blank" class="post-title">⚡ ${title}</a>
-                </div>
-            `;
-            feed.appendChild(postCard);
-        });
+    recorder.start();
+    
+    // تحميل الصورة إذا وجدت
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    if (imgSrc) img.src = "https://api.allorigins.win/raw?url=" + encodeURIComponent(imgSrc);
+
+    let frame = 0;
+    const totalFrames = 150; // 5 ثواني تقريباً
+
+    function draw() {
+        // خلفية
+        ctx.fillStyle = "#000";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // إذا وجدت صورة، ارسمها في الخلفية بتأثير زووم
+        if (img.complete && imgSrc) {
+            let scale = 1 + (frame * 0.002);
+            ctx.drawImage(img, (canvas.width - canvas.width*scale)/2, (canvas.height - canvas.height*scale)/2, canvas.width*scale, canvas.height*scale);
+            ctx.fillStyle = "rgba(0,0,0,0.4)"; // طبقة تظليل
+            ctx.fillRect(0,0, canvas.width, canvas.height);
+        }
+
+        // رسم النص
+        ctx.fillStyle = "#fff";
+        ctx.font = "bold 50px Tajawal";
+        ctx.textAlign = "center";
+        
+        // تقسيم النص الطويل
+        let words = title.split(' ');
+        let line1 = words.slice(0, 4).join(' ');
+        let line2 = words.slice(4).join(' ');
+        
+        ctx.shadowBlur = 10; ctx.shadowColor = "#0000ff";
+        ctx.fillText(line1, 360, 600);
+        ctx.fillText(line2, 360, 680);
+
+        // إطار متحرك
+        ctx.strokeStyle = "#0000ff";
+        ctx.lineWidth = 15;
+        ctx.strokeRect(20, 20, 680, 1240);
+
+        frame++;
+        if (frame < totalFrames) {
+            requestAnimationFrame(draw);
+        } else {
+            recorder.stop();
+        }
     }
-    btn.disabled = false;
-    btn.innerText = "تحديث القائمة 🔄";
+    
+    setTimeout(draw, 1000); // انتظر ثانية للتحميل
 }
 </script>
 
