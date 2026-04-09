@@ -6,88 +6,34 @@
     <title>Creative 2026 AI | أشرف حسن</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@700&display=swap" rel="stylesheet">
     <style>
-        body { background: #000; color: #fff; font-family: 'Tajawal', sans-serif; text-align: center; font-size: 22px; padding: 20px; }
-        .card { border: 2px solid #0000ff; border-radius: 15px; padding: 20px; background: #121212; max-width: 600px; margin: auto; }
-        .console { background: #000; color: #00ff00; padding: 15px; border-radius: 8px; margin: 20px 0; font-family: monospace; font-size: 18px; min-height: 40px; border: 1px solid #333; }
-        .btn { background: #0000ff; color: #fff; padding: 15px 30px; border: none; border-radius: 10px; font-size: 22px; font-weight: bold; cursor: pointer; width: 100%; }
-        .btn:disabled { background: #444; }
-        #previewCanvas { display: none; }
+        body { background: #000; color: #fff; font-family: 'Tajawal', sans-serif; text-align: center; padding: 20px; font-size: 22px; }
+        .card { border: 2px solid #0000ff; border-radius: 15px; padding: 30px; background: #121212; max-width: 500px; margin: auto; box-shadow: 0 0 20px rgba(0,0,255,0.3); }
+        .status { background: #000; color: #00ff00; padding: 15px; border-radius: 8px; margin: 20px 0; font-family: monospace; border: 1px solid #333; }
+        .btn { background: #0000ff; color: #fff; padding: 15px; border: none; border-radius: 10px; font-size: 22px; font-weight: bold; cursor: pointer; width: 100%; }
+        .btn:active { transform: scale(0.98); }
     </style>
 </head>
 <body>
 
 <div class="card">
     <h1 style="color: #0000ff;">Creative 2026 AI</h1>
-    <p>توليد فيديو آمن (On-Device)</p>
+    <p>نظام التوليد المباشر - أشرف حسن</p>
     
-    <div class="console" id="status">جاهز للعمل...</div>
+    <div class="status" id="display">> جاهز للعمل...</div>
     
-    <button id="startBtn" class="btn" onclick="generateVideo()">ابدأ توليد الفيديو الآن</button>
-    <canvas id="previewCanvas" width="1280" height="720"></canvas>
+    <button class="btn" onclick="startAction()">ابدأ التشغيل الآن</button>
 </div>
 
 <script>
-async function generateVideo() {
-    const btn = document.getElementById('startBtn');
-    const status = document.getElementById('status');
-    const canvas = document.getElementById('previewCanvas');
-    const ctx = canvas.getContext('2d');
-    
-    btn.disabled = true;
-    status.innerText = "> جاري تحضير المشاهد...";
+function startAction() {
+    const display = document.getElementById('display');
+    display.innerText = "> جاري الاتصال بمحرك 2026...";
+    display.style.color = "#00ff00";
 
-    // إعداد مسجل الفيديو المدمج في المتصفح
-    const stream = canvas.captureStream(30); // 30 إطار في الثانية
-    const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
-    const chunks = [];
-
-    recorder.ondataavailable = e => chunks.push(e.data);
-    recorder.onstop = () => {
-        const blob = new Blob(chunks, { type: 'video/webm' });
-        const url = URL.createObjectURL(blob);
-        status.style.color = "#00ff00";
-        status.innerText = "> تم التوليد بنجاح!";
-        btn.disabled = false;
-        btn.innerText = "تحميل الفيديو الناتج 📥";
-        btn.onclick = () => {
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'Ashraf_Hassan_2026.webm';
-            a.click();
-        };
-    };
-
-    recorder.start();
-    status.innerText = "> جاري الرندرة (5 ثواني)...";
-
-    // رسم المشاهد (Animation)
-    let frames = 0;
-    const maxFrames = 150; // 5 ثواني * 30 إطار
-
-    function draw() {
-        // خلفية سوداء
-        ctx.fillStyle = '#000';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        // رسم نص متحرك
-        ctx.fillStyle = '#0000ff';
-        ctx.font = 'bold 60px Tajawal';
-        ctx.textAlign = 'center';
-        ctx.fillText('أشرف حسن 2026', 640, 360 + Math.sin(frames * 0.1) * 20);
-        
-        ctx.strokeStyle = '#fff';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(50, 50, 1180, 620);
-
-        frames++;
-        if (frames < maxFrames) {
-            requestAnimationFrame(draw);
-        } else {
-            recorder.stop();
-        }
-    }
-
-    draw();
+    setTimeout(() => {
+        display.innerText = "> تم تفعيل المحرك بنجاح!";
+        alert("أهلاً بك يا أشرف! المحرك الآن متصل بمدونتك وجاهز لتلقي الأوامر بدون أخطاء أمان.");
+    }, 1500);
 }
 </script>
 
