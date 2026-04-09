@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creative 2026 AI | محرك الصور الذكي</title>
+    <title>Creative 2026 AI | معالج الصور والمقالات</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@700&display=swap" rel="stylesheet">
     <style>
         :root { --blue: #0000ff; --black: #000000; }
@@ -20,58 +20,61 @@
             background: #1a1a1a; border: 1px solid #333; border-radius: 10px; margin-bottom: 20px; 
             overflow: hidden; text-align: right; transition: 0.3s;
         }
-        .post-card:hover { border-color: var(--blue); transform: translateY(-5px); }
         
-        /* معالج الصور الافتراضية */
         .post-thumb { 
             width: 100%; height: 180px; background: linear-gradient(45deg, #000033, #0000ff); 
-            display: flex; align-items: center; justify-content: center; overflow: hidden;
-            color: #fff; font-size: 24px; font-weight: bold; text-align: center; padding: 10px;
+            display: flex; align-items: center; justify-content: center; 
+            color: #fff; font-size: 20px; font-weight: bold; text-align: center; padding: 15px;
         }
 
         .post-content { padding: 15px; }
-        .post-title { color: #fff; text-decoration: none; font-size: 20px; display: block; margin-bottom: 10px; }
-        
+        .post-title { color: #fff; text-decoration: none; font-size: 20px; display: block; margin-bottom: 10px; font-weight: bold; }
         .btn { background: var(--blue); color: #fff; padding: 18px; border: none; border-radius: 10px; font-size: 22px; font-weight: bold; cursor: pointer; width: 100%; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h1 style="color: var(--blue);">Creative 2026 AI</h1>
-    <p style="font-size: 18px; color: #aaa;">معالج الصور والمحتوى الذكي | أشرف حسن</p>
+    <h1 style="color: var(--blue); margin:0;">Creative 2026 AI</h1>
+    <p style="font-size: 16px; color: #aaa; margin-bottom:20px;">نظام معالجة المحتوى الرقمي - أشرف حسن</p>
     
     <select id="blogSelect">
-        <option value="https://ashraf-creative.blogspot.com">1. Creative (الرئيسية)</option>
-        <option value="https://ashrafhassan2026.blogspot.com">2. Ashraf Hassan 2026</option>
-        <option value="https://www.sherifpro.com">3. Sherif Pro</option>
-        <option value="https://creative2026.blogspot.com">4. Creative 2026</option>
-        <option value="https://ashraf-demo1.blogspot.com">5. Ashraf Demo 1</option>
-        <option value="https://optimum2026.blogspot.com">6. Optimum 2026</option>
+        <option value="ashraf-creative.blogspot.com">1. Creative (الرئيسية)</option>
+        <option value="ashrafhassan2026.blogspot.com">2. Ashraf Hassan 2026</option>
+        <option value="www.sherifpro.com">3. Sherif Pro</option>
+        <option value="creative2026.blogspot.com">4. Creative 2026</option>
+        <option value="ashraf-demo1.blogspot.com">5. Ashraf Demo 1</option>
+        <option value="optimum2026.blogspot.com">6. Optimum 2026</option>
+        <option value="ashraftt66.blogspot.com">7. منصة الاختبار</option>
     </select>
 
-    <div class="status" id="display">> المحرك جاهز لمعالجة الصور...</div>
-    <button class="btn" id="mainBtn" onclick="fetchWithAI()">جلب المقالات وتحليل الصور</button>
+    <div class="status" id="display">> جاهز للاتصال الآمن...</div>
+    <button class="btn" id="mainBtn" onclick="fetchWithBridge()">سحب وتحليل المقالات الآن</button>
 
     <div id="feed" style="margin-top:25px;"></div>
 </div>
 
 <script>
-async function fetchWithAI() {
+async function fetchWithBridge() {
     const blogUrl = document.getElementById('blogSelect').value;
     const display = document.getElementById('display');
     const feed = document.getElementById('feed');
     const btn = document.getElementById('mainBtn');
 
     btn.disabled = true;
-    display.innerText = `> جاري تحليل المحرك...`;
+    display.innerText = `> جاري فك تشفير البيانات...`;
+    display.style.color = "#00ff00";
 
     try {
-        const rssUrl = `${blogUrl.replace(/\/$/, "")}/feeds/posts/default?alt=json`;
-        const response = await fetch(rssUrl);
-        const data = await response.json();
+        // استخدام جسر تقني (CORS Bridge) لتجاوز الحماية وسحب البيانات بأمان
+        const proxy = "https://api.allorigins.win/get?url=";
+        const target = encodeURIComponent(`https://${blogUrl}/feeds/posts/default?alt=json`);
+        
+        const response = await fetch(proxy + target);
+        const bridgeData = await response.json();
+        const data = JSON.parse(bridgeData.contents);
 
-        display.innerText = "> تم معالجة الصور والمقالات بنجاح!";
+        display.innerText = "> تم سحب المحتوى بنجاح!";
         feed.innerHTML = "";
 
         const entries = data.feed.entry || [];
@@ -79,17 +82,16 @@ async function fetchWithAI() {
             const title = entry.title.$t;
             const link = entry.link.find(l => l.rel === 'alternate').href;
             
-            // محاولة إيجاد صورة داخل المقال
+            // البحث عن صورةThumbnail
             let imgSrc = "";
             if (entry.media$thumbnail) {
-                imgSrc = entry.media$thumbnail.url.replace("s72-c", "s1600");
+                imgSrc = entry.media$thumbnail.url.replace("s72-c", "s640");
             }
 
-            // بناء الكارت
             const postCard = document.createElement('div');
             postCard.className = "post-card";
             
-            // إذا لم توجد صورة، ننشئ غلافاً بالذكاء البرمجي يحمل العنوان
+            // حل ذكي للمقالات بلا صور: نستخدم غلاف ملون بعنوان المقال
             const thumbHTML = imgSrc 
                 ? `<img src="${imgSrc}" style="width:100%; height:180px; object-fit:cover;">`
                 : `<div class="post-thumb"><span>${title}</span></div>`;
@@ -98,17 +100,19 @@ async function fetchWithAI() {
                 ${thumbHTML}
                 <div class="post-content">
                     <a href="${link}" target="_blank" class="post-title">⚡ ${title}</a>
-                    <button onclick="window.open('${link}')" style="background:none; border:1px solid var(--blue); color:var(--blue); padding:5px 10px; border-radius:5px; cursor:pointer;">قراءة المزيد</button>
+                    <p style="font-size:14px; color:#888;">مصدر المقال: ${blogUrl}</p>
                 </div>
             `;
             feed.appendChild(postCard);
         });
 
         btn.disabled = false;
+        btn.innerText = "تحديث البيانات 🔄";
     } catch (error) {
         display.style.color = "red";
-        display.innerText = "> خطأ في سحب البيانات.";
+        display.innerText = "> خطأ: يرجى المحاولة مرة أخرى أو التأكد من إعدادات المدونة.";
         btn.disabled = false;
+        console.error(error);
     }
 }
 </script>
