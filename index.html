@@ -2,157 +2,93 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Creative 2026 AI | أشرف حسن</title>
-    
-    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.10.1/dist/ffmpeg.min.js"></script>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --blue-primary: #0000ff;
-            --black-deep: #000000;
-            --black-surface: #121212;
-            --text-main: #FFFFFF;
-        }
-
-        body {
-            background-color: var(--black-deep);
-            color: var(--text-main);
-            font-family: 'Tajawal', sans-serif;
-            font-size: 22px;
-            margin: 0;
-            padding: 0;
-            line-height: 1.6;
-        }
-
-        header {
-            padding: 30px 20px;
-            text-align: center;
-            background: linear-gradient(145deg, #000033, #000000);
-            border-bottom: 3px solid var(--blue-primary);
-        }
-
-        main { padding: 20px; max-width: 800px; margin: 0 auto; }
-
-        .card {
-            background: var(--black-surface);
-            border: 1px solid var(--blue-primary);
-            border-radius: 15px;
-            padding: 25px;
-            text-align: center;
-        }
-
-        .console-box {
-            background: #050505;
-            color: #00ff00;
-            font-family: monospace;
-            padding: 15px;
-            border-radius: 8px;
-            font-size: 18px;
-            margin: 20px 0;
-            border: 1px solid #333;
-            min-height: 50px;
-            direction: ltr;
-        }
-
-        .btn {
-            display: inline-block;
-            width: 100%;
-            background: var(--blue-primary);
-            color: white;
-            padding: 15px;
-            border-radius: 10px;
-            border: none;
-            font-size: 22px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .btn:disabled { background: #444; cursor: wait; }
-
-        footer { text-align: center; padding: 20px; font-size: 16px; color: #888; }
+        body { background: #000; color: #fff; font-family: 'Tajawal', sans-serif; text-align: center; font-size: 22px; padding: 20px; }
+        .card { border: 2px solid #0000ff; border-radius: 15px; padding: 20px; background: #121212; max-width: 600px; margin: auto; }
+        .console { background: #000; color: #00ff00; padding: 15px; border-radius: 8px; margin: 20px 0; font-family: monospace; font-size: 18px; min-height: 40px; border: 1px solid #333; }
+        .btn { background: #0000ff; color: #fff; padding: 15px 30px; border: none; border-radius: 10px; font-size: 22px; font-weight: bold; cursor: pointer; width: 100%; }
+        .btn:disabled { background: #444; }
+        #previewCanvas { display: none; }
     </style>
 </head>
 <body>
 
-<header>
-    <h1 style="color: var(--blue-primary); margin:0;">Creative 2026 AI</h1>
-    <p>أشرف حسن - خبير تطوير المحتوى الرقمي</p>
-</header>
-
-<main>
-    <section class="card">
-        <h3>محرك الرندرة المستقل</h3>
-        <p>توليد فيديو بصيغة MP4 مباشرة من المتصفح</p>
-        
-        <div class="console-box" id="status-console">
-            > نظام أشرف حسن جاهز...
-        </div>
-
-        <button id="startBtn" class="btn" onclick="startProcessing()">ابدأ عملية التوليد الآن</button>
-    </section>
-</main>
-
-<footer>
-    &copy; 2026 أشرف حسن | تقنيات البرمجيات الخضراء
-</footer>
+<div class="card">
+    <h1 style="color: #0000ff;">Creative 2026 AI</h1>
+    <p>توليد فيديو آمن (On-Device)</p>
+    
+    <div class="console" id="status">جاهز للعمل...</div>
+    
+    <button id="startBtn" class="btn" onclick="generateVideo()">ابدأ توليد الفيديو الآن</button>
+    <canvas id="previewCanvas" width="1280" height="720"></canvas>
+</div>
 
 <script>
-    const { createFFmpeg } = FFmpeg;
+async function generateVideo() {
+    const btn = document.getElementById('startBtn');
+    const status = document.getElementById('status');
+    const canvas = document.getElementById('previewCanvas');
+    const ctx = canvas.getContext('2d');
     
-    // إعداد المحرك للعمل بنظام النواة الواحدة لتجنب مشاكل الأمان
-    const ffmpeg = createFFmpeg({ 
-        log: true,
-        corePath: 'https://unpkg.com/@ffmpeg/core@0.10.0/dist/ffmpeg-core.js'
-    });
+    btn.disabled = true;
+    status.innerText = "> جاري تحضير المشاهد...";
 
-    async function startProcessing() {
-        const consoleBox = document.getElementById('status-console');
-        const btn = document.getElementById('startBtn');
+    // إعداد مسجل الفيديو المدمج في المتصفح
+    const stream = canvas.captureStream(30); // 30 إطار في الثانية
+    const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+    const chunks = [];
 
-        try {
-            btn.disabled = true;
-            consoleBox.innerText = "> Loading Engine...";
+    recorder.ondataavailable = e => chunks.push(e.data);
+    recorder.onstop = () => {
+        const blob = new Blob(chunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        status.style.color = "#00ff00";
+        status.innerText = "> تم التوليد بنجاح!";
+        btn.disabled = false;
+        btn.innerText = "تحميل الفيديو الناتج 📥";
+        btn.onclick = () => {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Ashraf_Hassan_2026.webm';
+            a.click();
+        };
+    };
 
-            // تحميل المحرك
-            if (!ffmpeg.isLoaded()) {
-                await ffmpeg.load();
-            }
+    recorder.start();
+    status.innerText = "> جاري الرندرة (5 ثواني)...";
 
-            consoleBox.innerText = "> Rendering Video (3s)...";
+    // رسم المشاهد (Animation)
+    let frames = 0;
+    const maxFrames = 150; // 5 ثواني * 30 إطار
 
-            // أمر رندرة فيديو اختباري (خلفية زرقاء)
-            await ffmpeg.run('-f', 'lavfi', '-i', 'color=c=blue:s=1280x720:d=3', 'output.mp4');
+    function draw() {
+        // خلفية سوداء
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // رسم نص متحرك
+        ctx.fillStyle = '#0000ff';
+        ctx.font = 'bold 60px Tajawal';
+        ctx.textAlign = 'center';
+        ctx.fillText('أشرف حسن 2026', 640, 360 + Math.sin(frames * 0.1) * 20);
+        
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(50, 50, 1180, 620);
 
-            consoleBox.innerText = "> Success! Preparing File...";
-            
-            const data = ffmpeg.FS('readFile', 'output.mp4');
-            const url = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
-
-            consoleBox.style.color = "#00ff00";
-            consoleBox.innerText = "> Done! Video Ready.";
-            
-            btn.disabled = false;
-            btn.innerText = "تحميل الفيديو 📥";
-            btn.style.background = "#28a745";
-            
-            btn.onclick = () => {
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'Ashraf_Creative_2026.mp4';
-                a.click();
-            };
-
-        } catch (e) {
-            console.error(e);
-            consoleBox.style.color = "red";
-            consoleBox.innerText = "> Error: " + e.message;
-            btn.disabled = false;
+        frames++;
+        if (frames < maxFrames) {
+            requestAnimationFrame(draw);
+        } else {
+            recorder.stop();
         }
     }
+
+    draw();
+}
 </script>
 
 </body>
