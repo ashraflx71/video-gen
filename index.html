@@ -3,75 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creative 2026 AI | محرك المحتوى</title>
+    <title>Creative 2026 AI | شبكة المدونات</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@700&display=swap" rel="stylesheet">
     <style>
         :root { --blue: #0000ff; --black: #000000; }
-        body { background: var(--black); color: #fff; font-family: 'Tajawal', sans-serif; text-align: center; padding: 20px; font-size: 22px; }
-        .card { border: 2px solid var(--blue); border-radius: 15px; padding: 25px; background: #121212; max-width: 600px; margin: auto; box-shadow: 0 0 20px rgba(0,0,255,0.3); }
+        body { background: var(--black); color: #fff; font-family: 'Tajawal', sans-serif; text-align: center; padding: 20px; font-size: 22px; margin: 0; }
+        .card { border: 2px solid var(--blue); border-radius: 15px; padding: 25px; background: #121212; max-width: 600px; margin: 20px auto; box-shadow: 0 0 20px rgba(0,0,255,0.3); }
         .status { background: #000; color: #00ff00; padding: 10px; border-radius: 8px; margin: 15px 0; font-family: monospace; font-size: 18px; border: 1px solid #333; }
-        .feed-container { text-align: right; margin-top: 20px; max-height: 300px; overflow-y: auto; padding: 10px; border: 1px dashed var(--blue); }
-        .post-link { color: #fff; text-decoration: none; display: block; padding: 10px; border-bottom: 1px solid #333; transition: 0.3s; }
-        .post-link:hover { background: var(--blue); color: #fff; }
+        
+        /* تصميم القائمة المنسدلة */
+        select { 
+            width: 100%; padding: 15px; border-radius: 10px; background: #000; color: #fff; 
+            border: 1px solid var(--blue); font-size: 20px; margin-bottom: 20px; font-family: 'Tajawal';
+        }
+
+        .feed-container { text-align: right; margin-top: 20px; max-height: 400px; overflow-y: auto; padding: 10px; border: 1px dashed var(--blue); }
+        .post-link { color: #fff; text-decoration: none; display: block; padding: 12px; border-bottom: 1px solid #333; transition: 0.3s; font-size: 18px; }
+        .post-link:hover { background: var(--blue); }
         .btn { background: var(--blue); color: #fff; padding: 15px; border: none; border-radius: 10px; font-size: 22px; font-weight: bold; cursor: pointer; width: 100%; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h1 style="color: var(--blue);">Creative 2026 AI</h1>
-    <p>توليد محتوى المدونات | أشرف حسن</p>
+    <h1 style="color: var(--blue); margin-bottom: 5px;">Creative 2026 AI</h1>
+    <p style="font-size: 18px; margin-bottom: 20px;">إدارة شبكة مدونات أشرف حسن</p>
     
-    <div class="status" id="display">> المحرك متصل وجاهز...</div>
+    <label for="blogSelect" style="display:block; text-align:right; margin-bottom:10px;">اختر المدونة المستهدفة:</label>
+    <select id="blogSelect">
+        <option value="ashraf-creative">Creative 2026 (الرئيسية)</option>
+        <option value="optimum-2026">Optimum 2026</option>
+        <option value="sherifpro-fix">Sherif Pro (صيانة السيارات)</option>
+        </select>
+
+    <div class="status" id="display">> جاهز للربط...</div>
     
-    <button class="btn" id="mainBtn" onclick="fetchMyBlogPosts()">سحب مقالات المدونة الآن</button>
+    <button class="btn" id="mainBtn" onclick="fetchSelectedBlog()">سحب المقالات الآن</button>
 
     <div id="feed" class="feed-container" style="display:none;">
-        <p style="color:var(--blue); font-size: 18px;">أحدث المقالات المكتشفة:</p>
         <div id="postsList"></div>
     </div>
 </div>
 
 <script>
-async function fetchMyBlogPosts() {
+async function fetchSelectedBlog() {
+    const blogId = document.getElementById('blogSelect').value;
     const display = document.getElementById('display');
     const feed = document.getElementById('feed');
     const postsList = document.getElementById('postsList');
     const btn = document.getElementById('mainBtn');
 
     btn.disabled = true;
-    display.innerText = "> جاري فحص الرابط: ashraf-creative.blogspot.com...";
+    display.innerText = `> جاري فحص مدونة ${blogId}...`;
 
     try {
-        // استخدام محول RSS بسيط لسحب البيانات من بلوجر
-        const rssUrl = "https://ashraf-creative.blogspot.com/feeds/posts/default?alt=json";
+        const rssUrl = `https://${blogId}.blogspot.com/feeds/posts/default?alt=json`;
         const response = await fetch(rssUrl);
         const data = await response.json();
 
-        display.innerText = "> تم العثور على المقالات بنجاح!";
+        display.innerText = "> تم تحديث البيانات بنجاح!";
         feed.style.display = "block";
         postsList.innerHTML = "";
 
-        // عرض أول 5 مقالات
         const entries = data.feed.entry || [];
-        entries.slice(0, 5).forEach(entry => {
-            const title = entry.title.$t;
-            const link = entry.link.find(l => l.rel === 'alternate').href;
-            
-            const item = document.createElement('a');
-            item.href = link;
-            item.target = "_blank";
-            item.className = "post-link";
-            item.innerText = "📌 " + title;
-            postsList.appendChild(item);
-        });
+        if(entries.length === 0) {
+            postsList.innerHTML = "<p style='text-align:center;'>لا توجد مقالات منشورة حالياً.</p>";
+        } else {
+            entries.slice(0, 6).forEach(entry => {
+                const title = entry.title.$t;
+                const link = entry.link.find(l => l.rel === 'alternate').href;
+                
+                const item = document.createElement('a');
+                item.href = link;
+                item.target = "_blank";
+                item.className = "post-link";
+                item.innerText = "⭐ " + title;
+                postsList.appendChild(item);
+            });
+        }
 
         btn.disabled = false;
-        btn.innerText = "تحديث القائمة 🔄";
+        btn.innerText = "تحديث البيانات 🔄";
         
     } catch (error) {
         display.style.color = "red";
-        display.innerText = "> خطأ في سحب البيانات: " + error.message;
+        display.innerText = "> تأكد من رابط المدونة أو إعدادات الخصوصية.";
         btn.disabled = false;
     }
 }
