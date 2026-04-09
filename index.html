@@ -21,21 +21,9 @@
 
         body {
             background-color: var(--black-deep);
-            color: var(--text-main);<main>
-    <section class="card">
-        <h2>محرك توليد الفيديو الفعلي</h2>
-        <p>رندرة محلية (On-Device) بنظام البرمجيات الخضراء المستدامة.</p>
-        
-        <div class="console-box" id="status-console">
-            > النظام جاهز للعمل بدون سيرفرات...
-        </div>
-
-        <button id="startBtn" class="btn" onclick="startProcessing()">ابدأ الرندرة الآن (MP4)</button>
-    </section>
-</main>
-
+            color: var(--text-main);
             font-family: 'Tajawal', sans-serif;
-            font-size: 22px; /* الحجم المفضل لسيادتك */
+            font-size: 22px;
             margin: 0;
             padding: 0;
             line-height: 1.6;
@@ -72,6 +60,8 @@
             margin: 20px 0;
             border: 1px solid #333;
             min-height: 60px;
+            text-align: left;
+            direction: ltr;
         }
 
         .btn {
@@ -107,7 +97,7 @@
         <p>رندرة محلية (On-Device) بنظام البرمجيات الخضراء المستدامة.</p>
         
         <div class="console-box" id="status-console">
-            > النظام جاهز للعمل بدون سيرفرات...
+            > Ready for rendering...
         </div>
 
         <button id="startBtn" class="btn" onclick="startProcessing()">ابدأ الرندرة الآن (MP4)</button>
@@ -129,26 +119,25 @@
 
         try {
             btn.disabled = true;
-            consoleBox.innerText = "> جاري استدعاء محرك FFmpeg.wasm...";
+            consoleBox.innerText = "> Loading FFmpeg.wasm...";
 
             if (!ffmpeg.isLoaded()) {
                 await ffmpeg.load();
             }
 
-            consoleBox.innerText = "> جاري معالجة الإطارات برؤية Creative 2026...";
+            consoleBox.innerText = "> Rendering frames (Creative 2026)...";
 
-            // كود الرندرة: إنشاء فيديو 5 ثواني بخلفية زرقاء ونص أبيض
-            // ملاحظة: drawtext يتطلب ملف خط، هنا سنقوم بعمل فيديو لوني بسيط للتجربة
+            // رندرة فيديو اختباري
             await ffmpeg.run('-f', 'lavfi', '-i', 'color=c=blue:s=1280x720:d=5', 'output.mp4');
 
-            consoleBox.innerText = "> تم الانتهاء! جاري تجهيز ملف التحميل...";
+            consoleBox.innerText = "> Success! Preparing download...";
             
             const data = ffmpeg.FS('readFile', 'output.mp4');
             const videoBlob = new Blob([data.buffer], { type: 'video/mp4' });
             const url = URL.createObjectURL(videoBlob);
 
             consoleBox.style.color = "#00ff00";
-            consoleBox.innerText = "> تم توليد الفيديو بنجاح داخل هاتفك!";
+            consoleBox.innerText = "> Video Generated Locally!";
             
             btn.disabled = false;
             btn.innerText = "تحميل الفيديو الناتج 📥";
@@ -164,7 +153,7 @@
         } catch (e) {
             console.error(e);
             consoleBox.style.color = "red";
-            consoleBox.innerText = "> تنبيه: المتصفح يحتاج دعم SharedArrayBuffer أو تحديث الأمان.";
+            consoleBox.innerText = "> Error: SharedArrayBuffer check failed.";
             btn.disabled = false;
         }
     }
