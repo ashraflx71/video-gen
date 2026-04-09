@@ -1,33 +1,162 @@
-// وظيفة التوليد المعتمدة كلياً على الجافاسكريبت (No Python)
-async function startGeneration() {
-    const consoleBox = document.getElementById('status-console');
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Creative 2026 AI | أشرف حسن</title>
     
-    consoleBox.innerText = "> جاري تحضير محرك الـ Canvas الذكي...";
+    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
     
-    // 1. محاكاة تحليل سكريبت الفيديو
-    await new Promise(r => setTimeout(r, 1500));
-    consoleBox.innerText = "> جاري معالجة الصور والألوان (Black & Blue Theme)...";
-    
-    // 2. إنشاء عنصر Canvas مخفي للرندرة
-    const canvas = document.createElement('canvas');
-    canvas.width = 1280;
-    canvas.height = 720;
-    const ctx = canvas.getContext('2d');
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0000ff">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
 
-    // 3. رسم خلفية الفيديو (Green Software Principle: تقليل الجرافيك المعقد)
-    ctx.fillStyle = '#000000';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#0000ff';
-    ctx.font = 'bold 50px Tajawal';
-    ctx.textAlign = 'center';
-    ctx.fillText('أشرف حسن 2026 - رؤية تقنية', 640, 360);
+    <style>
+        :root {
+            --blue-primary: #0000ff;
+            --black-deep: #000000;
+            --black-surface: #121212;
+            --text-main: #FFFFFF;
+        }
 
-    consoleBox.innerText = "> جاري دمج طبقات الفيديو داخل المتصفح...";
-    
-    // 4. النتيجة النهائية
-    await new Promise(r => setTimeout(r, 2000));
-    consoleBox.style.color = "#00ff00";
-    consoleBox.innerText = "> تم توليد معاينة الفيديو بنجاح!";
-    
-    alert("تمت الرندرة داخل المتصفح بنجاح (بدون سيرفرات خارجية)");
-}
+        body {
+            background-color: var(--black-deep);
+            color: var(--text-main);
+            font-family: 'Tajawal', sans-serif;
+            font-size: 22px; /* الحجم المفضل لسيادتك */
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        header {
+            padding: 40px 20px;
+            text-align: center;
+            background: linear-gradient(145deg, #000033, #000000);
+            border-bottom: 3px solid var(--blue-primary);
+            box-shadow: 0 4px 15px rgba(0, 0, 255, 0.3);
+        }
+
+        h1 { font-size: 2.5rem; margin: 0; color: var(--blue-primary); }
+
+        main { padding: 20px; max-width: 800px; margin: 0 auto; }
+
+        .card {
+            background: var(--black-surface);
+            border: 1px solid var(--blue-primary);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .console-box {
+            background: #050505;
+            color: #00ff00;
+            font-family: monospace;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 18px;
+            margin: 20px 0;
+            border: 1px solid #333;
+            min-height: 60px;
+        }
+
+        .btn {
+            display: inline-block;
+            width: 100%;
+            background: var(--blue-primary);
+            color: white;
+            padding: 15px;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 10px;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn:disabled { background: #444; cursor: not-allowed; }
+
+        footer { text-align: center; padding: 20px; font-size: 16px; color: #888; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Creative 2026 AI</h1>
+    <p>بإشراف الخبير التقني: أشرف حسن</p>
+</header>
+
+<main>
+    <section class="card">
+        <h2>محرك توليد الفيديو الفعلي</h2>
+        <p>رندرة محلية (On-Device) بنظام البرمجيات الخضراء المستدامة.</p>
+        
+        <div class="console-box" id="status-console">
+            > النظام جاهز للعمل بدون سيرفرات...
+        </div>
+
+        <button id="startBtn" class="btn" onclick="startProcessing()">ابدأ الرندرة الآن (MP4)</button>
+    </section>
+</main>
+
+<footer>
+    &copy; 2026 أشرف حسن - جميع الحقوق محفوظة <br>
+    تكنولوجيا رندرة المتصفح المتطورة
+</footer>
+
+<script>
+    const { createFFmpeg, fetchFile } = FFmpeg;
+    const ffmpeg = createFFmpeg({ log: true });
+
+    async function startProcessing() {
+        const consoleBox = document.getElementById('status-console');
+        const btn = document.getElementById('startBtn');
+
+        try {
+            btn.disabled = true;
+            consoleBox.innerText = "> جاري استدعاء محرك FFmpeg.wasm...";
+
+            if (!ffmpeg.isLoaded()) {
+                await ffmpeg.load();
+            }
+
+            consoleBox.innerText = "> جاري معالجة الإطارات برؤية Creative 2026...";
+
+            // كود الرندرة: إنشاء فيديو 5 ثواني بخلفية زرقاء ونص أبيض
+            // ملاحظة: drawtext يتطلب ملف خط، هنا سنقوم بعمل فيديو لوني بسيط للتجربة
+            await ffmpeg.run('-f', 'lavfi', '-i', 'color=c=blue:s=1280x720:d=5', 'output.mp4');
+
+            consoleBox.innerText = "> تم الانتهاء! جاري تجهيز ملف التحميل...";
+            
+            const data = ffmpeg.FS('readFile', 'output.mp4');
+            const videoBlob = new Blob([data.buffer], { type: 'video/mp4' });
+            const url = URL.createObjectURL(videoBlob);
+
+            consoleBox.style.color = "#00ff00";
+            consoleBox.innerText = "> تم توليد الفيديو بنجاح داخل هاتفك!";
+            
+            btn.disabled = false;
+            btn.innerText = "تحميل الفيديو الناتج 📥";
+            btn.style.background = "#28a745";
+            
+            btn.onclick = () => {
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'Creative_2026_Ashraf.mp4';
+                a.click();
+            };
+
+        } catch (e) {
+            console.error(e);
+            consoleBox.style.color = "red";
+            consoleBox.innerText = "> تنبيه: المتصفح يحتاج دعم SharedArrayBuffer أو تحديث الأمان.";
+            btn.disabled = false;
+        }
+    }
+</script>
+
+</body>
+</html>
