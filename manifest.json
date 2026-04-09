@@ -1,34 +1,21 @@
 {
-  "short_name": "Ashraf Tech",
-  "name": "Ashraf Hassan Ali - Creative 2026",
-  "description": "منصة التطوير التقني وأتمتة الفيديو والخبير في SEO",
+  "name": "Creative 2026 AI",
+  "short_name": "Creative2026",
+  "description": "منصة أشرف حسن للذكاء الاصطناعي والبرمجيات الخضراء",
+  "start_url": "/video-gen/index.html",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#0000ff",
   "icons": [
     {
-      "src": "/images/icon-192.png",
-      "type": "image/png",
+      "src": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgj_example_icon_192.png",
       "sizes": "192x192",
-      "purpose": "any maskable"
+      "type": "image/png"
     },
     {
-      "src": "/images/icon-512.png",
-      "type": "image/png",
-      "sizes": "512x512"
-    }
-  ],
-  "start_url": "/?utm_source=pwa",
-  "background_color": "#000000",
-  "display": "standalone",
-  "scope": "/",
-  "theme_color": "#FFD700",
-  "orientation": "portrait",
-  "categories": ["development", "business", "technology"],
-  "screenshots": [
-    {
-      "src": "/images/screenshot-mobile.png",
-      "sizes": "1080x1920",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "الواجهة الذهبية الفاخرة"
+      "src": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgj_example_icon_512.png",
+      "sizes": "512x512",
+      "type": "image/png"
     }
   ]
 }
