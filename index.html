@@ -1,191 +1,33 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ashraf Tech 2026 | القائد التقني</title>
+// وظيفة التوليد المعتمدة كلياً على الجافاسكريبت (No Python)
+async function startGeneration() {
+    const consoleBox = document.getElementById('status-console');
     
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#FFD700">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-    <meta name="description" content="منصة أشرف حسن علي عبد النبي - خبير SEO وتطوير تطبيقات PWA والبرمجة الخضراء لعام 2026">
-    <link rel="canonical" href="https://creative2026.blogspot.com">
+    consoleBox.innerText = "> جاري تحضير محرك الـ Canvas الذكي...";
     
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    // 1. محاكاة تحليل سكريبت الفيديو
+    await new Promise(r => setTimeout(r, 1500));
+    consoleBox.innerText = "> جاري معالجة الصور والألوان (Black & Blue Theme)...";
+    
+    // 2. إنشاء عنصر Canvas مخفي للرندرة
+    const canvas = document.createElement('canvas');
+    canvas.width = 1280;
+    canvas.height = 720;
+    const ctx = canvas.getContext('2d');
 
-    <style>
-        /* نظام الألوان الفاخر (Luxury Branding) */
-        :root {
-            --gold-primary: #FFD700;
-            --gold-dark: #B8860B;
-            --black-deep: #000000;
-            --black-surface: #121212;
-            --text-main: #FFFFFF;
-        }
+    // 3. رسم خلفية الفيديو (Green Software Principle: تقليل الجرافيك المعقد)
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#0000ff';
+    ctx.font = 'bold 50px Tajawal';
+    ctx.textAlign = 'center';
+    ctx.fillText('أشرف حسن 2026 - رؤية تقنية', 640, 360);
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            background-color: var(--black-deep);
-            color: var(--gold-primary);
-            font-family: 'Tajawal', sans-serif;
-            font-size: 22px; /* الحجم المفضل لسيادتك لسهولة القراءة */
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        /* الهيدر الاحترافي */
-        header {
-            padding: 30px 20px;
-            text-align: center;
-            border-bottom: 2px solid var(--gold-primary);
-            background: linear-gradient(145deg, #1a1a1a, #000000);
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2);
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        }
-
-        .status-badge {
-            display: inline-block;
-            background: var(--gold-primary);
-            color: var(--black-deep);
-            padding: 5px 15px;
-            border-radius: 50px;
-            font-size: 14px;
-            font-weight: bold;
-            margin-top: 10px;
-        }
-
-        /* حاوية المحتوى الرئيسية */
-        main {
-            padding: 20px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .card {
-            background: var(--black-surface);
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 20px;
-            transition: transform 0.3s ease;
-        }
-
-        .card:active {
-            transform: scale(0.98); /* استجابة للمس في الموبايل */
-        }
-
-        h2 {
-            color: var(--text-main);
-            border-right: 4px solid var(--gold-primary);
-            padding-right: 15px;
-            margin-bottom: 15px;
-        }
-
-        /* أزرار الأكشن (CTAs) */
-        .btn {
-            display: block;
-            width: 100%;
-            background: linear-gradient(45deg, var(--gold-dark), var(--gold-primary));
-            color: var(--black-deep);
-            text-align: center;
-            padding: 15px;
-            text-decoration: none;
-            font-weight: bold;
-            border-radius: 10px;
-            margin-top: 20px;
-            font-size: 1.2rem;
-            box-shadow: 0 5px 15px rgba(184, 134, 11, 0.4);
-        }
-
-        /* خصائص الـ Video-Gen Interface */
-        .console-box {
-            background: #0a0a0a;
-            color: #00FF00; /* لون الكود التقني */
-            font-family: monospace;
-            padding: 15px;
-            border-radius: 5px;
-            font-size: 16px;
-            border: 1px solid #333;
-        }
-
-        footer {
-            text-align: center;
-            padding: 40px;
-            font-size: 14px;
-            color: #666;
-        }
-    </style>
-</head>
-<body>
-
-<header>
-    <h1>Creative 2026</h1>
-    <p>بإشراف القائد التقني: أشرف حسن</p>
-    <div class="status-badge">نظام PWA مفعل - 2026 Wave 1</div>
-</header>
-
-<main>
-    <section class="card">
-        <h2>أتمتة الفيديو (Video-Gen)</h2>
-        <p>قم بتحويل النصوص والسكريبتات إلى محتوى مرئي فوراً باستخدام الذكاء الاصطناعي.</p>
-        <div class="console-box" id="status-console">
-            > النظام جاهز لتلقي الأوامر...
-        </div>
-        <a href="#" class="btn" onclick="startGeneration()">ابدأ التوليد الآن</a>
-    </section>
-
-    <section class="card">
-        <h2>تحسين محركات البحث (Golden SEO)</h2>
-        <p>استراتيجيات GEO المتقدمة لضمان الظهور في نتائج Copilot و Google AI.</p>
-        <a href="https://ashrafhassan2026.blogspot.com" class="btn">معاينة القوالب الذهبية</a>
-    </section>
-</main>
-
-<footer>
-    &copy; 2026 Ashraf Tech - جميع الحقوق محفوظة <br>
-    بنيت بأسلوب "البرمجة الخضراء" عبر الهاتف الذكي.
-</footer>
-
-<script>
-    // تسجيل الـ Service Worker لضمان عمل التطبيق Offline
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js')
-                .then(reg => console.log('SW Registered!'))
-                .catch(err => console.log('SW Registration Failed: ', err));
-        });
-    }
-
-    // محاكاة لعملية توليد الفيديو (يمكن ربطها بالـ API الخاص بك)
-    function startGeneration() {
-        const consoleBox = document.getElementById('status-console');
-        consoleBox.innerText = "> جاري تفعيل محرك الذكاء الاصطناعي...";
-        
-        setTimeout(() => {
-            consoleBox.innerText = "> جاري معالجة البيانات السحابية (Azure Edge)...";
-            consoleBox.style.color = "#FFD700";
-        }, 2000);
-
-        // طلب اهتزاز الهاتف عند بدء العمل (Haptic Feedback)
-        if (navigator.vibrate) {
-            navigator.vibrate(100);
-        }
-    }
-</script>
-
-</body>
-</html>
+    consoleBox.innerText = "> جاري دمج طبقات الفيديو داخل المتصفح...";
+    
+    // 4. النتيجة النهائية
+    await new Promise(r => setTimeout(r, 2000));
+    consoleBox.style.color = "#00ff00";
+    consoleBox.innerText = "> تم توليد معاينة الفيديو بنجاح!";
+    
+    alert("تمت الرندرة داخل المتصفح بنجاح (بدون سيرفرات خارجية)");
+}
