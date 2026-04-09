@@ -3,41 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creative 2026 AI | معالج المحتوى</title>
+    <title>Creative 2026 AI | الحل النهائي</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@700&display=swap" rel="stylesheet">
     <style>
         :root { --blue: #0000ff; --black: #000000; }
         body { background: var(--black); color: #fff; font-family: 'Tajawal', sans-serif; text-align: center; padding: 20px; font-size: 22px; margin: 0; }
         .card { border: 2px solid var(--blue); border-radius: 15px; padding: 25px; background: #121212; max-width: 600px; margin: 20px auto; box-shadow: 0 0 20px rgba(0,0,255,0.4); }
         .status { background: #000; color: #00ff00; padding: 12px; border-radius: 8px; margin: 15px 0; font-family: monospace; font-size: 18px; border: 1px solid #333; }
-        
-        select { 
-            width: 100%; padding: 15px; border-radius: 10px; background: #000; color: #fff; 
-            border: 1px solid var(--blue); font-size: 20px; margin-bottom: 20px; font-family: 'Tajawal'; outline: none;
-        }
-
-        .post-card { 
-            background: #1a1a1a; border: 1px solid #333; border-radius: 12px; margin-bottom: 25px; 
-            overflow: hidden; text-align: right; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-        }
-        
-        .post-thumb { 
-            width: 100%; height: 200px; background: linear-gradient(135deg, #000033 0%, #0000ff 100%); 
-            display: flex; align-items: center; justify-content: center; 
-            color: #fff; font-size: 22px; font-weight: bold; text-align: center; padding: 20px; line-height: 1.5;
-        }
-
+        select { width: 100%; padding: 15px; border-radius: 10px; background: #000; color: #fff; border: 1px solid var(--blue); font-size: 20px; margin-bottom: 20px; font-family: 'Tajawal'; outline: none; }
+        .post-card { background: #1a1a1a; border: 1px solid #333; border-radius: 12px; margin-bottom: 25px; overflow: hidden; text-align: right; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .post-thumb { width: 100%; height: 200px; background: linear-gradient(135deg, #000033 0%, #0000ff 100%); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 22px; font-weight: bold; text-align: center; padding: 20px; }
         .post-content { padding: 20px; }
-        .post-title { color: #fff; text-decoration: none; font-size: 20px; display: block; margin-bottom: 15px; line-height: 1.4; font-weight: bold; }
-        .btn { background: var(--blue); color: #fff; padding: 18px; border: none; border-radius: 10px; font-size: 22px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.3s; }
-        .btn:disabled { background: #444; opacity: 0.7; }
+        .post-title { color: #fff; text-decoration: none; font-size: 20px; display: block; margin-bottom: 10px; font-weight: bold; }
+        .btn { background: var(--blue); color: #fff; padding: 18px; border: none; border-radius: 10px; font-size: 22px; font-weight: bold; cursor: pointer; width: 100%; }
     </style>
 </head>
 <body>
 
 <div class="card">
     <h1 style="color: var(--blue); margin: 0 0 10px 0;">Creative 2026 AI</h1>
-    <p style="font-size: 16px; color: #888; margin-bottom: 25px;">نظام إدارة المحتوى الذكي - أشرف حسن</p>
+    <p style="font-size: 16px; color: #888; margin-bottom: 25px;">الإدارة المركزية - أشرف حسن</p>
     
     <select id="blogSelect">
         <option value="ashraf-creative.blogspot.com">Creative (الرئيسية)</option>
@@ -49,41 +34,49 @@
         <option value="ashraftt66.blogspot.com">منصة الاختبار</option>
     </select>
 
-    <div class="status" id="display">> المحرك جاهز للربط...</div>
-    <button class="btn" id="mainBtn" onclick="fetchSecureData()">سحب وتحليل المقالات الآن</button>
+    <div class="status" id="display">> جاهز للعمل...</div>
+    <button class="btn" id="mainBtn" onclick="loadBlogData()">سحب المقالات فوراً</button>
 
     <div id="feed" style="margin-top:30px;"></div>
 </div>
 
 <script>
-async function fetchSecureData() {
+function loadBlogData() {
     const blogUrl = document.getElementById('blogSelect').value;
     const display = document.getElementById('display');
-    const feed = document.getElementById('feed');
     const btn = document.getElementById('mainBtn');
 
     btn.disabled = true;
-    display.innerText = `> جاري تجاوز قيود الأمان وجلب البيانات...`;
+    display.innerText = "> جاري جلب البيانات بطريقة JSONP...";
     display.style.color = "#00ff00";
 
-    try {
-        // استخدام جسر AllOrigins لتجاوز مشكلة CORS
-        const proxy = "https://api.allorigins.win/get?url=";
-        const target = encodeURIComponent(`https://${blogUrl}/feeds/posts/default?alt=json`);
-        
-        const response = await fetch(proxy + target);
-        const bridgeData = await response.json();
-        const data = JSON.parse(bridgeData.contents);
+    // حذف أي سكريبت قديم لضمان التحديث
+    const oldScript = document.getElementById('bloggerScript');
+    if (oldScript) oldScript.remove();
 
-        display.innerText = "> تم سحب المحتوى بنجاح!";
-        feed.innerHTML = "";
+    // إنشاء سكريبت جديد لطلب البيانات وتجاوز CORS تماماً
+    const script = document.createElement('script');
+    script.id = 'bloggerScript';
+    script.src = `https://${blogUrl}/feeds/posts/default?alt=json-in-script&callback=renderPosts&max-results=6`;
+    document.body.appendChild(script);
+}
 
-        const entries = data.feed.entry || [];
-        entries.slice(0, 6).forEach(entry => {
+function renderPosts(data) {
+    const feed = document.getElementById('feed');
+    const display = document.getElementById('display');
+    const btn = document.getElementById('mainBtn');
+    
+    feed.innerHTML = "";
+    display.innerText = "> تم تحديث المحتوى بنجاح!";
+
+    const entries = data.feed.entry || [];
+    if (entries.length === 0) {
+        feed.innerHTML = "<p>لا توجد مقالات منشورة.</p>";
+    } else {
+        entries.forEach(entry => {
             const title = entry.title.$t;
             const link = entry.link.find(l => l.rel === 'alternate').href;
             
-            // استخراج صورة المقال إن وجدت
             let imgSrc = "";
             if (entry.media$thumbnail) {
                 imgSrc = entry.media$thumbnail.url.replace("s72-c", "s1600");
@@ -92,29 +85,21 @@ async function fetchSecureData() {
             const postCard = document.createElement('div');
             postCard.className = "post-card";
             
-            // الحل الذكي للمقالات بلا صور: ننشئ غلافاً يحمل العنوان
             const thumbHTML = imgSrc 
-                ? `<img src="${imgSrc}" style="width:100%; height:200px; object-fit:cover;" onerror="this.outerHTML='<div class=\'post-thumb\'>${title}</div>'">`
+                ? `<img src="${imgSrc}" style="width:100%; height:200px; object-fit:cover;">`
                 : `<div class="post-thumb"><span>${title}</span></div>`;
 
             postCard.innerHTML = `
                 ${thumbHTML}
                 <div class="post-content">
                     <a href="${link}" target="_blank" class="post-title">⚡ ${title}</a>
-                    <p style="font-size:14px; color:#555; margin:0;">المصدر: ${blogUrl}</p>
                 </div>
             `;
             feed.appendChild(postCard);
         });
-
-        btn.disabled = false;
-        btn.innerText = "تحديث الشبكة 🔄";
-    } catch (error) {
-        display.style.color = "red";
-        display.innerText = "> تعذر السحب. تأكد من أن المدونة عامة وليست خاصة.";
-        btn.disabled = false;
-        btn.innerText = "إعادة المحاولة";
     }
+    btn.disabled = false;
+    btn.innerText = "تحديث القائمة 🔄";
 }
 </script>
 
