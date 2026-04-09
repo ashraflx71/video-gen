@@ -3,37 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creative 2026 AI | أشرف حسن</title>
+    <title>Creative 2026 AI | محرك المحتوى</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@700&display=swap" rel="stylesheet">
     <style>
-        body { background: #000; color: #fff; font-family: 'Tajawal', sans-serif; text-align: center; padding: 20px; font-size: 22px; }
-        .card { border: 2px solid #0000ff; border-radius: 15px; padding: 30px; background: #121212; max-width: 500px; margin: auto; box-shadow: 0 0 20px rgba(0,0,255,0.3); }
-        .status { background: #000; color: #00ff00; padding: 15px; border-radius: 8px; margin: 20px 0; font-family: monospace; border: 1px solid #333; }
-        .btn { background: #0000ff; color: #fff; padding: 15px; border: none; border-radius: 10px; font-size: 22px; font-weight: bold; cursor: pointer; width: 100%; }
-        .btn:active { transform: scale(0.98); }
+        :root { --blue: #0000ff; --black: #000000; }
+        body { background: var(--black); color: #fff; font-family: 'Tajawal', sans-serif; text-align: center; padding: 20px; font-size: 22px; }
+        .card { border: 2px solid var(--blue); border-radius: 15px; padding: 25px; background: #121212; max-width: 600px; margin: auto; box-shadow: 0 0 20px rgba(0,0,255,0.3); }
+        .status { background: #000; color: #00ff00; padding: 10px; border-radius: 8px; margin: 15px 0; font-family: monospace; font-size: 18px; border: 1px solid #333; }
+        .feed-container { text-align: right; margin-top: 20px; max-height: 300px; overflow-y: auto; padding: 10px; border: 1px dashed var(--blue); }
+        .post-link { color: #fff; text-decoration: none; display: block; padding: 10px; border-bottom: 1px solid #333; transition: 0.3s; }
+        .post-link:hover { background: var(--blue); color: #fff; }
+        .btn { background: var(--blue); color: #fff; padding: 15px; border: none; border-radius: 10px; font-size: 22px; font-weight: bold; cursor: pointer; width: 100%; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h1 style="color: #0000ff;">Creative 2026 AI</h1>
-    <p>نظام التوليد المباشر - أشرف حسن</p>
+    <h1 style="color: var(--blue);">Creative 2026 AI</h1>
+    <p>توليد محتوى المدونات | أشرف حسن</p>
     
-    <div class="status" id="display">> جاهز للعمل...</div>
+    <div class="status" id="display">> المحرك متصل وجاهز...</div>
     
-    <button class="btn" onclick="startAction()">ابدأ التشغيل الآن</button>
+    <button class="btn" id="mainBtn" onclick="fetchMyBlogPosts()">سحب مقالات المدونة الآن</button>
+
+    <div id="feed" class="feed-container" style="display:none;">
+        <p style="color:var(--blue); font-size: 18px;">أحدث المقالات المكتشفة:</p>
+        <div id="postsList"></div>
+    </div>
 </div>
 
 <script>
-function startAction() {
+async function fetchMyBlogPosts() {
     const display = document.getElementById('display');
-    display.innerText = "> جاري الاتصال بمحرك 2026...";
-    display.style.color = "#00ff00";
+    const feed = document.getElementById('feed');
+    const postsList = document.getElementById('postsList');
+    const btn = document.getElementById('mainBtn');
 
-    setTimeout(() => {
-        display.innerText = "> تم تفعيل المحرك بنجاح!";
-        alert("أهلاً بك يا أشرف! المحرك الآن متصل بمدونتك وجاهز لتلقي الأوامر بدون أخطاء أمان.");
-    }, 1500);
+    btn.disabled = true;
+    display.innerText = "> جاري فحص الرابط: ashraf-creative.blogspot.com...";
+
+    try {
+        // استخدام محول RSS بسيط لسحب البيانات من بلوجر
+        const rssUrl = "https://ashraf-creative.blogspot.com/feeds/posts/default?alt=json";
+        const response = await fetch(rssUrl);
+        const data = await response.json();
+
+        display.innerText = "> تم العثور على المقالات بنجاح!";
+        feed.style.display = "block";
+        postsList.innerHTML = "";
+
+        // عرض أول 5 مقالات
+        const entries = data.feed.entry || [];
+        entries.slice(0, 5).forEach(entry => {
+            const title = entry.title.$t;
+            const link = entry.link.find(l => l.rel === 'alternate').href;
+            
+            const item = document.createElement('a');
+            item.href = link;
+            item.target = "_blank";
+            item.className = "post-link";
+            item.innerText = "📌 " + title;
+            postsList.appendChild(item);
+        });
+
+        btn.disabled = false;
+        btn.innerText = "تحديث القائمة 🔄";
+        
+    } catch (error) {
+        display.style.color = "red";
+        display.innerText = "> خطأ في سحب البيانات: " + error.message;
+        btn.disabled = false;
+    }
 }
 </script>
 
