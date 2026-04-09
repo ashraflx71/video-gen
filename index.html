@@ -3,45 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creative 2026 AI | لوحة إدارة المدونات الستة</title>
+    <title>Creative 2026 AI | شبكة أشرف حسن المتكاملة</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@700&display=swap" rel="stylesheet">
     <style>
         :root { --blue: #0000ff; --black: #000000; }
         body { background: var(--black); color: #fff; font-family: 'Tajawal', sans-serif; text-align: center; padding: 20px; font-size: 22px; margin: 0; }
-        .card { border: 2px solid var(--blue); border-radius: 15px; padding: 25px; background: #121212; max-width: 600px; margin: 20px auto; box-shadow: 0 0 20px rgba(0,0,255,0.3); }
-        .status { background: #000; color: #00ff00; padding: 10px; border-radius: 8px; margin: 15px 0; font-family: monospace; font-size: 18px; border: 1px solid #333; }
+        .card { border: 2px solid var(--blue); border-radius: 15px; padding: 25px; background: #121212; max-width: 650px; margin: 20px auto; box-shadow: 0 0 25px rgba(0,0,255,0.4); }
+        .status { background: #000; color: #00ff00; padding: 12px; border-radius: 8px; margin: 15px 0; font-family: monospace; font-size: 18px; border: 1px solid #333; min-height: 30px; }
         
         select { 
             width: 100%; padding: 15px; border-radius: 10px; background: #000; color: #fff; 
             border: 1px solid var(--blue); font-size: 20px; margin-bottom: 20px; font-family: 'Tajawal';
-            cursor: pointer;
+            cursor: pointer; outline: none;
         }
 
-        .feed-container { text-align: right; margin-top: 20px; max-height: 400px; overflow-y: auto; padding: 10px; border: 1px dashed var(--blue); }
-        .post-link { color: #fff; text-decoration: none; display: block; padding: 12px; border-bottom: 1px solid #333; transition: 0.3s; font-size: 18px; }
-        .post-link:hover { background: var(--blue); }
-        .btn { background: var(--blue); color: #fff; padding: 15px; border: none; border-radius: 10px; font-size: 22px; font-weight: bold; cursor: pointer; width: 100%; }
+        .feed-container { text-align: right; margin-top: 20px; max-height: 450px; overflow-y: auto; padding: 15px; border: 1px dashed var(--blue); border-radius: 10px; background: #0a0a0a; }
+        .post-link { color: #fff; text-decoration: none; display: block; padding: 15px; border-bottom: 1px solid #222; transition: 0.3s; font-size: 20px; line-height: 1.4; }
+        .post-link:hover { background: var(--blue); transform: scale(1.01); }
+        .btn { background: var(--blue); color: #fff; padding: 18px; border: none; border-radius: 10px; font-size: 22px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.3s; }
+        .btn:disabled { background: #444; cursor: wait; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h1 style="color: var(--blue); margin-bottom: 5px;">Creative 2026 AI</h1>
-    <p style="font-size: 18px; margin-bottom: 20px;">النظام الموحد لإدارة مدونات أشرف حسن</p>
+    <h1 style="color: var(--blue); margin-bottom: 10px;">Creative 2026 AI</h1>
+    <p style="font-size: 18px; margin-bottom: 25px; color: #aaa;">منصة الإدارة المركزية | الخبير أشرف حسن</p>
     
-    <label style="display:block; text-align:right; margin-bottom:10px;">اختر من شبكة مدوناتك الستة:</label>
+    <label style="display:block; text-align:right; margin-bottom:10px;">اختر إحدى مدوناتك الستة:</label>
     <select id="blogSelect">
-        <option value="ashraf-creative">1. Creative 2026 (الرئيسية)</option>
-        <option value="optimum-2026">2. Optimum 2026 (المحتوى المتطور)</option>
-        <option value="sherifpro-fix">3. Sherif Pro (صيانة وتجديد السيارات)</option>
-        <option value="backtozero-2026">4. Back to Zero (مشروع العودة للصفر)</option>
-        <option value="green-software-2026">5. Green Software (البرمجيات الخضراء)</option>
-        <option value="literary-summaries">6. ملخصات أدبية (قناة اليوتيوب)</option>
+        <option value="https://ashraf-creative.blogspot.com">1. Creative (الرئيسية)</option>
+        <option value="https://ashrafhassan2026.blogspot.com">2. Ashraf Hassan 2026</option>
+        <option value="https://www.sherifpro.com">3. Sherif Pro (صيانة السيارات)</option>
+        <option value="https://creative2026.blogspot.com">4. Creative 2026 (الاحتياطية)</option>
+        <option value="https://ashraf-demo1.blogspot.com">5. Ashraf Demo 1</option>
+        <option value="https://optimum2026.blogspot.com">6. Optimum 2026</option>
+        <option value="https://ashraftt66.blogspot.com">7. منصة الاختبار (ashraftt66)</option>
     </select>
 
-    <div class="status" id="display">> النظام جاهز لإدارة الشبكة...</div>
+    <div class="status" id="display">> جاهز للربط مع شبكة 2026...</div>
     
-    <button class="btn" id="mainBtn" onclick="fetchSelectedBlog()">سحب المقالات الآن</button>
+    <button class="btn" id="mainBtn" onclick="fetchSelectedBlog()">جلب أحدث المقالات</button>
 
     <div id="feed" class="feed-container" style="display:none;">
         <div id="postsList"></div>
@@ -50,28 +52,32 @@
 
 <script>
 async function fetchSelectedBlog() {
-    const blogId = document.getElementById('blogSelect').value;
+    const blogUrl = document.getElementById('blogSelect').value;
     const display = document.getElementById('display');
     const feed = document.getElementById('feed');
     const postsList = document.getElementById('postsList');
     const btn = document.getElementById('mainBtn');
 
     btn.disabled = true;
-    display.innerText = `> جاري فحص البيانات في ${blogId}...`;
+    display.innerText = `> جاري الاتصال بالسيرفر...`;
+    display.style.color = "#00ff00";
 
     try {
-        // الربط مع واجهة بلوجر البرمجية
-        const rssUrl = `https://${blogId}.blogspot.com/feeds/posts/default?alt=json`;
+        // الربط البرمجي مع Feed المدونة المختارة
+        const rssUrl = `${blogUrl.replace(/\/$/, "")}/feeds/posts/default?alt=json`;
         const response = await fetch(rssUrl);
+        
+        if (!response.ok) throw new Error("تعذر الاتصال بالمدونة");
+        
         const data = await response.json();
 
-        display.innerText = "> تم تحديث المحتوى بنجاح!";
+        display.innerText = "> تم تحديث المقالات بنجاح!";
         feed.style.display = "block";
         postsList.innerHTML = "";
 
         const entries = data.feed.entry || [];
         if(entries.length === 0) {
-            postsList.innerHTML = "<p style='text-align:center;'>لا توجد مقالات منشورة في هذه المدونة حتى الآن.</p>";
+            postsList.innerHTML = "<p style='text-align:center; padding:20px;'>لا توجد مقالات منشورة في هذا الرابط.</p>";
         } else {
             entries.slice(0, 6).forEach(entry => {
                 const title = entry.title.$t;
@@ -81,7 +87,7 @@ async function fetchSelectedBlog() {
                 item.href = link;
                 item.target = "_blank";
                 item.className = "post-link";
-                item.innerText = "📌 " + title;
+                item.innerText = "⚡ " + title;
                 postsList.appendChild(item);
             });
         }
@@ -91,8 +97,9 @@ async function fetchSelectedBlog() {
         
     } catch (error) {
         display.style.color = "red";
-        display.innerText = "> لم نتمكن من الوصول للمدونة، تأكد من الرابط.";
+        display.innerText = "> خطأ: تأكد من إعدادات الـ RSS للمدونة المحددة.";
         btn.disabled = false;
+        btn.innerText = "حاول مرة أخرى";
     }
 }
 </script>
