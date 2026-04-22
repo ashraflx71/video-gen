@@ -1,165 +1,50 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creative 2026 AI | استوديو الفيديو</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@700&display=swap" rel="stylesheet">
-    <style>
-        :root { --blue: #0000ff; --black: #000000; }
-        body { background: var(--black); color: #fff; font-family: 'Tajawal', sans-serif; text-align: center; padding: 20px; font-size: 22px; margin: 0; }
-        .card { border: 2px solid var(--blue); border-radius: 15px; padding: 25px; background: #121212; max-width: 650px; margin: 20px auto; }
-        .status { background: #000; color: #00ff00; padding: 12px; border-radius: 8px; margin: 15px 0; font-family: monospace; font-size: 18px; border: 1px solid #333; }
-        select { width: 100%; padding: 15px; border-radius: 10px; background: #000; color: #fff; border: 1px solid var(--blue); font-size: 20px; margin-bottom: 20px; font-family: 'Tajawal'; }
-        .post-card { background: #1a1a1a; border: 1px solid #333; border-radius: 12px; margin-bottom: 25px; overflow: hidden; text-align: right; }
-        .post-content { padding: 20px; }
-        .post-title { color: #fff; text-decoration: none; font-size: 20px; display: block; margin-bottom: 15px; font-weight: bold; }
-        .btn-gen { background: var(--blue); color: #fff; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 18px; width: 100%; }
-        #renderCanvas { display: none; } /* المحرك يعمل في الخلفية */
-        .download-link { display: block; margin-top: 10px; color: #00ff00; text-decoration: none; font-size: 18px; }
-    </style>
-</head>
-<body>
-
-<div class="card">
-    <h1 style="color: var(--blue); margin: 0 0 10px 0;">Creative 2026 AI</h1>
-    <p style="font-size: 16px; color: #888;">استوديو توليد الفيديو - أشرف حسن</p>
+<div style="background-color: #000; color: #FFD700; padding: 20px; border: 2px solid #FFD700; border-radius: 15px; text-align: center; font-family: Arial, sans-serif;">
+    <h2 style="color: #FFD700;">صانع فيديوهات قناة أشرف حسن</h2>
+    <p style="color: #fff;">أدخل نص المقال لتحويله لمقطع Shorts احترافي</p>
     
-    <select id="blogSelect">
-        <option value="ashraf-creative.blogspot.com">Creative (الرئيسية)</option>
-        <option value="ashrafhassan2026.blogspot.com">Ashraf Hassan 2026</option>
-        <option value="www.sherifpro.com">Sherif Pro</option>
-        <option value="optimum2026.blogspot.com">Optimum 2026</option>
-    </select>
+    <textarea id="articleText" placeholder="اكتب نص المقال هنا..." style="width: 90%; height: 120px; padding: 10px; border-radius: 8px; border: 1px solid #FFD700; background: #111; color: #fff; text-align: right;"></textarea>
+    <br><br>
+    
+    <button onclick="uploadAndCreate()" style="background: linear-gradient(45deg, #FFD700, #b8860b); color: #000; padding: 12px 30px; border: none; border-radius: 25px; cursor: pointer; font-weight: bold; font-size: 16px;">
+        توليد فيديو القناة الآن
+    </button>
 
-    <div class="status" id="display">> المحرك جاهز للإنتاج...</div>
-    <button style="background:var(--blue); color:#fff; width:100%; padding:15px; border:none; border-radius:10px; font-size:20px; cursor:pointer;" onclick="loadBlogData()">عرض المقالات للتوليد</button>
-
-    <div id="feed" style="margin-top:30px;"></div>
+    <div id="status" style="margin-top: 15px; color: #00ff00; display: none;">جاري المعالجة...</div>
+    
+    <div id="videoPreview" style="margin-top: 25px;"></div>
 </div>
 
-<canvas id="renderCanvas" width="720" height="1280"></canvas>
+<script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
 
 <script>
-function loadBlogData() {
-    const blogUrl = document.getElementById('blogSelect').value;
-    const script = document.createElement('script');
-    script.src = `https://${blogUrl}/feeds/posts/default?alt=json-in-script&callback=renderPosts&max-results=5`;
-    document.body.appendChild(script);
-}
+// ضع بياناتك هنا من لوحة تحكم Cloudinary
+const cloudName = "ضع_هنا_Cloud_Name"; 
+const apiKey = "ضع_هنا_API_Key";
 
-function renderPosts(data) {
-    const feed = document.getElementById('feed');
-    feed.innerHTML = "";
-    data.feed.entry.forEach((entry, index) => {
-        const title = entry.title.$t;
-        let imgSrc = entry.media$thumbnail ? entry.media$thumbnail.url.replace("s72-c", "s1600") : "";
-        
-        const card = document.createElement('div');
-        card.className = "post-card";
-        card.innerHTML = `
-            <div class="post-content">
-                <span class="post-title">${title}</span>
-                <button class="btn-gen" id="btn-${index}" onclick="generateVideo('${title}', '${imgSrc}', ${index})">صناعة فيديو Short لهذا المقال 🎬</button>
-                <div id="link-${index}"></div>
-            </div>
-        `;
-        feed.appendChild(card);
-    });
-}
+function uploadAndCreate() {
+    const text = document.getElementById('articleText').value;
+    const status = document.getElementById('status');
+    const preview = document.getElementById('videoPreview');
 
-async function generateVideo(title, imgSrc, id) {
-    const canvas = document.getElementById('renderCanvas');
-    const ctx = canvas.getContext('2d');
-    const status = document.getElementById('display');
-    const btn = document.getElementById(`btn-${id}`);
+    if(!text) { alert("برجاء إدخال نص المقال"); return; }
     
-    btn.disabled = true;
-    status.innerText = "> جاري رندرة الفيديو (Shorts)...";
-
-    // إعداد المسجل
-    const stream = canvas.captureStream(30);
-    const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
-    const chunks = [];
-    recorder.ondataavailable = e => chunks.push(e.data);
-    recorder.onstop = () => {
-        const blob = new Blob(chunks, { type: 'video/webm' });
-        const url = URL.createObjectURL(blob);
-        document.getElementById(`link-${id}`).innerHTML = `<a href="${url}" download="Ashraf_Video_${id}.webm" class="download-link">تحميل الفيديو الناتج 📥</a>`;
-        status.innerText = "> تم إنتاج الفيديو بنجاح!";
-        btn.disabled = false;
-    };
-
-    recorder.start();
+    status.style.display = 'block';
     
-    // تحميل الصورة إذا وجدت
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    if (imgSrc) img.src = "https://api.allorigins.win/raw?url=" + encodeURIComponent(imgSrc);
-
-    let frame = 0;
-    const totalFrames = 150; // 5 ثواني تقريباً
-
-    function draw() {
-        // خلفية
-        ctx.fillStyle = "#000";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // إذا وجدت صورة، ارسمها في الخلفية بتأثير زووم
-        if (img.complete && imgSrc) {
-            let scale = 1 + (frame * 0.002);
-            ctx.drawImage(img, (canvas.width - canvas.width*scale)/2, (canvas.height - canvas.height*scale)/2, canvas.width*scale, canvas.height*scale);
-            ctx.fillStyle = "rgba(0,0,0,0.4)"; // طبقة تظليل
-            ctx.fillRect(0,0, canvas.width, canvas.height);
-        }
-
-        // رسم النص
-        ctx.fillStyle = "#fff";
-        ctx.font = "bold 50px Tajawal";
-        ctx.textAlign = "center";
-        
-        // تقسيم النص الطويل
-        let words = title.split(' ');
-        let line1 = words.slice(0, 4).join(' ');
-        let line2 = words.slice(4).join(' ');
-        
-        ctx.shadowBlur = 10; ctx.shadowColor = "#0000ff";
-        ctx.fillText(line1, 360, 600);
-        ctx.fillText(line2, 360, 680);
-
-        // إطار متحرك
-        ctx.strokeStyle = "#0000ff";
-        ctx.lineWidth = 15;
-        ctx.strokeRect(20, 20, 680, 1240);
-
-        frame++;
-        if (frame < totalFrames) {
-            requestAnimationFrame(draw);
-        } else {
-            recorder.stop();
-        }
-    }
+    // هذا الرابط يستخدم تقنية التحويل المباشر (Transformation) 
+    // ليقوم بكتابة النص فوق فيديو خلفية موجود في حسابك
+    // سنفترض أن لديك فيديو باسم "background_video"
     
-    setTimeout(draw, 1000); // انتظر ثانية للتحميل
-}
-</script>
+    const transformedUrl = `https://res.cloudinary.com/${cloudName}/video/upload/c_fill,g_center,h_1920,w_1080/l_text:Arial_60_bold_center:${encodeURIComponent(text)},color_white,g_center/background_video.mp4`;
 
-</body>
-</html>
-<div id="video-container">
-   <video id="outputVideo" controls width="100%">
-      <source src="" type="video/mp4">
-   </video>
-</div>
-
-<script>
-async function generateForYouTube() {
-    // الرابط الذي ستحصل عليه من الخدمة المجانية يوضع هنا
-    const apiUrl = "https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/video/upload";
+    preview.innerHTML = `
+        <p style="color: #fff;">تم تجهيز فيديو القناة!</p>
+        <video controls style="width: 100%; max-width: 300px; border: 2px solid #FFD700; border-radius: 10px;">
+            <source src="${transformedUrl}" type="video/mp4">
+        </video>
+        <br><br>
+        <a href="${transformedUrl}" target="_blank" style="display: inline-block; background: #FFD700; color: #000; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">تحميل الفيديو لليوتيوب</a>
+    `;
     
-    // الكود الذي يسحب نص المقال ويرسله للخدمة
-    console.log("جاري الربط مع API الخدمة لصناعة فيديو القناة...");
-    
-    // ... بقية كود الربط ...
+    status.style.display = 'none';
 }
 </script>
