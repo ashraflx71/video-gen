@@ -1,50 +1,83 @@
-<div style="background-color: #000; color: #FFD700; padding: 20px; border: 2px solid #FFD700; border-radius: 15px; text-align: center; font-family: Arial, sans-serif;">
-    <h2 style="color: #FFD700;">صانع فيديوهات قناة أشرف حسن</h2>
-    <p style="color: #fff;">أدخل نص المقال لتحويله لمقطع Shorts احترافي</p>
+<div id="ashraf-video-tool" style="background-color: #000; color: #FFD700; padding: 25px; border: 3px solid #FFD700; border-radius: 20px; text-align: center; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; direction: rtl;">
     
-    <textarea id="articleText" placeholder="اكتب نص المقال هنا..." style="width: 90%; height: 120px; padding: 10px; border-radius: 8px; border: 1px solid #FFD700; background: #111; color: #fff; text-align: right;"></textarea>
-    <br><br>
+    <h2 style="color: #FFD700; text-shadow: 2px 2px 4px #444;">محرر فيديوهات القناة الذكي</h2>
+    <p style="color: #ffffff; font-size: 14px;">حوّل مقالات مدونتك إلى فيديوهات Shorts بضغطة زر</p>
     
-    <button onclick="uploadAndCreate()" style="background: linear-gradient(45deg, #FFD700, #b8860b); color: #000; padding: 12px 30px; border: none; border-radius: 25px; cursor: pointer; font-weight: bold; font-size: 16px;">
-        توليد فيديو القناة الآن
+    <div style="margin: 20px 0;">
+        <textarea id="articleContent" placeholder="أدخل نص المقال هنا..." style="width: 100%; height: 150px; padding: 15px; border-radius: 12px; border: 1px solid #FFD700; background-color: #1a1a1a; color: #fff; font-size: 16px; resize: none;"></textarea>
+    </div>
+    
+    <button onclick="generateAshrafVideo()" id="genBtn" style="background: linear-gradient(45deg, #FFD700, #b8860b); color: #000; padding: 15px 40px; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; font-size: 18px; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);">
+        صناعة الفيديو الآن
     </button>
 
-    <div id="status" style="margin-top: 15px; color: #00ff00; display: none;">جاري المعالجة...</div>
-    
-    <div id="videoPreview" style="margin-top: 25px;"></div>
-</div>
+    <div id="loaderStatus" style="display: none; margin-top: 20px; color: #FFD700;">
+        <div style="border: 4px solid #f3f3f3; border-top: 4px solid #FFD700; border-radius: 50%; width: 30px; height: 30px; animation: spin 2s linear infinite; margin: 0 auto;"></div>
+        <p>جاري المعالجة عبر Cloudinary...</p>
+    </div>
 
-<script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
-
-<script>
-// ضع بياناتك هنا من لوحة تحكم Cloudinary
-const cloudName = "ضع_هنا_Cloud_Name"; 
-const apiKey = "ضع_هنا_API_Key";
-
-function uploadAndCreate() {
-    const text = document.getElementById('articleText').value;
-    const status = document.getElementById('status');
-    const preview = document.getElementById('videoPreview');
-
-    if(!text) { alert("برجاء إدخال نص المقال"); return; }
-    
-    status.style.display = 'block';
-    
-    // هذا الرابط يستخدم تقنية التحويل المباشر (Transformation) 
-    // ليقوم بكتابة النص فوق فيديو خلفية موجود في حسابك
-    // سنفترض أن لديك فيديو باسم "background_video"
-    
-    const transformedUrl = `https://res.cloudinary.com/${cloudName}/video/upload/c_fill,g_center,h_1920,w_1080/l_text:Arial_60_bold_center:${encodeURIComponent(text)},color_white,g_center/background_video.mp4`;
-
-    preview.innerHTML = `
-        <p style="color: #fff;">تم تجهيز فيديو القناة!</p>
-        <video controls style="width: 100%; max-width: 300px; border: 2px solid #FFD700; border-radius: 10px;">
-            <source src="${transformedUrl}" type="video/mp4">
+    <div id="videoOutput" style="margin-top: 30px; display: none;">
+        <h3 style="color: #fff;">الفيديو جاهز للتحميل:</h3>
+        <video id="finalVideo" controls style="width: 100%; max-width: 320px; border: 2px solid #FFD700; border-radius: 15px; box-shadow: 0 0 20px rgba(255,215,0,0.2);">
+            <source src="" type="video/mp4">
+            متصفحك لا يدعم تشغيل الفيديو.
         </video>
         <br><br>
-        <a href="${transformedUrl}" target="_blank" style="display: inline-block; background: #FFD700; color: #000; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">تحميل الفيديو لليوتيوب</a>
-    `;
+        <a id="downloadLnk" href="#" target="_blank" style="display: inline-block; background-color: #ffffff; color: #000; padding: 10px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">حفظ الفيديو على الموبايل</a>
+    </div>
+</div>
+
+<style>
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+#articleContent::placeholder { color: #888; }
+</style>
+
+<script>
+async function generateAshrafVideo() {
+    const text = document.getElementById('articleContent').value;
+    const btn = document.getElementById('genBtn');
+    const loader = document.getElementById('loaderStatus');
+    const output = document.getElementById('videoOutput');
+    const videoTag = document.getElementById('finalVideo');
+    const downloadLnk = document.getElementById('downloadLnk');
+
+    if (!text) {
+        alert("من فضلك أدخل نص المقال أولاً");
+        return;
+    }
+
+    // البيانات المستخرجة من حسابك
+    const cloudName = "dpxxxxxxx"; // استبدل dpxxxxxxx بـ Cloud Name الظاهر في Dashboard (الموجود بجانب API Key)
     
-    status.style.display = 'none';
+    // إظهار اللودر وإخفاء النتائج السابقة
+    btn.style.opacity = "0.5";
+    btn.disabled = true;
+    loader.style.display = "block";
+    output.style.display = "none";
+
+    // تنظيف النص وتجهيزه للرابط
+    const cleanText = encodeURIComponent(text.trim());
+
+    /**
+     * شرح العملية:
+     * نستخدم تقنية URL Transformation في Cloudinary.
+     * h_1920,w_1080: لضبط المقاس ليكون Shorts (طولي).
+     * l_text:Arial_60_bold: لإضافة النص فوق الفيديو.
+     */
+    const generatedUrl = `https://res.cloudinary.com/${cloudName}/video/upload/c_fill,g_center,h_1920,w_1080/l_text:Arial_60_bold_center:${cleanText},color_white,g_center/sample.mp4`;
+
+    // محاكاة وقت المعالجة وتحديث الواجهة
+    setTimeout(() => {
+        videoTag.src = generatedUrl;
+        downloadLnk.href = generatedUrl;
+        
+        loader.style.display = "none";
+        output.style.display = "block";
+        btn.style.opacity = "1";
+        btn.disabled = false;
+        
+        // التمرير التلقائي لمشاهدة الفيديو
+        output.scrollIntoView({ behavior: 'smooth' });
+    }, 2000);
 }
 </script>
