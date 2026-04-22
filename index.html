@@ -146,3 +146,20 @@ async function generateVideo(title, imgSrc, id) {
 
 </body>
 </html>
+<div id="video-container">
+   <video id="outputVideo" controls width="100%">
+      <source src="" type="video/mp4">
+   </video>
+</div>
+
+<script>
+async function generateForYouTube() {
+    // الرابط الذي ستحصل عليه من الخدمة المجانية يوضع هنا
+    const apiUrl = "https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/video/upload";
+    
+    // الكود الذي يسحب نص المقال ويرسله للخدمة
+    console.log("جاري الربط مع API الخدمة لصناعة فيديو القناة...");
+    
+    // ... بقية كود الربط ...
+}
+</script>
