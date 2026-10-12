@@ -12,13 +12,17 @@
     
     <!-- منطقة المعاينة واللوحة -->
     <div class="preview-area">
+      <video id="sourceVideo" style="display:none;" crossorigin="anonymous" playsinline></video>
       <canvas id="videoCanvas" width="800" height="450"></canvas>
     </div>
 
     <!-- شريط التحكم والأدوات -->
     <div class="controls">
       <!-- رفع الفيديو -->
-      <input type="file" id="uploadVideo" accept="video/*">
+      <div class="upload-section">
+        <label for="uploadVideo" class="upload-btn">اختر فيديو للتحميل</label>
+        <input type="file" id="uploadVideo" accept="video/*">
+      </div>
       
       <!-- إضافة نص فوق الفيديو -->
       <div class="text-tools">
@@ -29,15 +33,14 @@
       <!-- الفلترات والتأثيرات -->
       <div class="filter-tools">
         <label>التأثيرات المرئية:</label>
-        <button onclick="applyFilter('none')">عادي</button>
-        <button onclick="applyFilter('grayscale(100%)')">أبيض وأسود</button>
-        <button onclick="applyFilter('sepia(100%)')">سيبيا (كلاسيكي)</button>
-        <button onclick="applyFilter('contrast(150%)')">تباين عالٍ</button>
+        <button class="filter-btn" data-filter="none">عادي</button>
+        <button class="filter-btn" data-filter="grayscale(100%)">أبيض وأسود</button>
+        <button class="filter-btn" data-filter="sepia(100%)">سيبيا (كلاسيكي)</button>
+        <button class="filter-btn" data-filter="contrast(150%)">تباين عالٍ</button>
       </div>
     </div>
   </div>
 
   <script src="script.js"></script>
-  <script src="app.js"></script>
 </body>
 </html>
