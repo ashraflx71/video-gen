@@ -1,58 +1,78 @@
-
-/* الإعدادات العامة */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
+/* style.css - تنسيقات محسنة لمنع الشاشة السوداء وضبط الشاشة */
 body {
-    background-color: #000000; /* خلفية سوداء فخمة */
-    color: #FFFFFF;
-    line-height: 1.6;
-    font-size: 20px; /* خط كبير لسهولة القراءة من الهاتف */
+  background-color: #f0f2f5; /* خلفية رمادية فاتحة وليست سوداء */
+  color: #333;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
 }
 
-/* التنسيقات الذهبية */
-h1, h2, h3, .gold-text {
-    color: #D4AF37; /* لون ذهبي كلاسيكي */
-    margin-bottom: 20px;
-    font-weight: bold;
-}
-
-/* تنسيق الحاويات */
 .container {
-    padding: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-width: 850px;
+  width: 100%;
+  text-align: center;
 }
 
-/* تنسيق الأزرار */
-.button {
-    background-color: #D4AF37;
-    color: #000000;
-    padding: 15px 30px;
-    border: none;
-    border-radius: 8px;
-    font-size: 22px;
-    font-weight: bold;
-    cursor: pointer;
-    display: inline-block;
-    text-decoration: none;
+h1 {
+  font-size: 22px;
+  margin-bottom: 20px;
+  color: #1a1a1a;
 }
 
-.button:hover {
-    background-color: #FFD700; /* ذهبي أفتح عند التمرير */
+.preview-area {
+  margin-bottom: 20px;
+  background: #000;
+  border-radius: 8px;
+  overflow: hidden;
+  display: inline-block;
 }
 
-/* تحسين العرض على الموبايل */
-@media (max-width: 600px) {
-    body {
-        font-size: 22px; /* تكبير الخط أكثر للشاشات الصغيرة */
-    }
-    
-    .container {
-        padding: 15px;
-    }
+canvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+}
+
+.text-tools, .filter-tools {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+input[type="text"] {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  width: 250px;
+}
+
+button {
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+button:hover {
+  background-color: #0056b3;
 }
