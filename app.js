@@ -1,4 +1,4 @@
-// app.js - التحكم بـ Canvas والمؤثرات
+// app.js - نسخة محسنة لمنع الشاشة السوداء
 
 const canvas = document.getElementById('videoCanvas');
 const ctx = canvas.getContext('2d');
@@ -7,6 +7,8 @@ const overlayTextInput = document.getElementById('overlayText');
 const addTextBtn = document.getElementById('addTextBtn');
 
 let video = document.createElement('video');
+video.crossOrigin = "anonymous";
+video.muted = true; // كتم الصوت لمنع مشاكل التشغيل التلقائي في المتصفحات
 let currentText = '';
 let currentFilter = 'none';
 
@@ -15,8 +17,14 @@ uploadVideo.addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (file) {
     video.src = URL.createObjectURL(file);
-    video.play();
-    requestAnimationFrame(renderCanvas);
+    video.load();
+    video.onloadeddata = () => {
+      video.play().then(() => {
+        drawFrame();
+      }).catch(err => {
+        console.log("خطأ في تشغيل الفيديو:", err);
+      });
+    };
   }
 });
 
@@ -30,8 +38,8 @@ function applyFilter(filterStyle) {
   currentFilter = filterStyle;
 }
 
-// رسم الفيديو مع التأثيرات والنص على الـ Canvas
-function renderCanvas() {
+// رسم الإطارات باستمرار
+function drawFrame() {
   if (!video.paused && !video.ended) {
     // تطبيق الفلتر على اللوحة
     ctx.filter = currentFilter;
@@ -52,7 +60,6 @@ function renderCanvas() {
       ctx.strokeText(currentText, canvas.width / 2, canvas.height - 40);
       ctx.fillText(currentText, canvas.width / 2, canvas.height - 40);
     }
-
-    requestAnimationFrame(renderCanvas);
   }
+  requestAnimationFrame(drawFrame);
 }
