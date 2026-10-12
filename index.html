@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Video Gen - محرر الفيديوهات الذكي</title>
+  <title>Video Gen - محرر ومولد الفيديوهات</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
 </head>
 <body>
   <div class="container">
@@ -20,7 +21,6 @@
     <div class="controls">
       <!-- رفع الفيديو -->
       <div class="upload-section">
-        <label for="uploadVideo" class="upload-btn">اختر فيديو للتحميل</label>
         <input type="file" id="uploadVideo" accept="video/*">
       </div>
       
@@ -35,12 +35,18 @@
         <label>التأثيرات المرئية:</label>
         <button class="filter-btn" data-filter="none">عادي</button>
         <button class="filter-btn" data-filter="grayscale(100%)">أبيض وأسود</button>
-        <button class="filter-btn" data-filter="sepia(100%)">سيبيا (كلاسيكي)</button>
+        <button class="filter-btn" data-filter="sepia(100%)">سيبيا</button>
         <button class="filter-btn" data-filter="contrast(150%)">تباين عالٍ</button>
       </div>
     </div>
   </div>
 
+  <!-- تضمين ملفات السكريبت بالترتيب الصحيح -->
+  <script src="coi-serviceworker.js"></script>
+  <script src="canvas-editor.js"></script>
+  <script src="video-generator.js"></script>
+  <script src="youtube-downloader.js"></script>
   <script src="script.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
