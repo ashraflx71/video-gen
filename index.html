@@ -1,52 +1,138 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Video Gen - محرر ومولد الفيديوهات</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="manifest" href="manifest.json">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>محرر الفيديوهات ومولد المؤثرات (Video Gen)</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin:0; padding:12px; font-family: Arial, sans-serif; background:#111; color:#fff; }
+  h1 { font-size:18px; text-align:center; margin:0 0 12px; }
+  .box { background:#1c1c1c; border-radius:10px; padding:10px; margin-bottom:10px; }
+  canvas { width:100%; height:auto; background:#000; border-radius:8px; display:block; }
+  input[type=text] { width:100%; padding:10px; border-radius:6px; border:1px solid #444; background:#222; color:#fff; font-size:16px; }
+  input[type=file] { width:100%; color:#ccc; }
+  .row { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+  button { flex:1 1 40%; padding:12px; border:0; border-radius:8px; background:#2d7ff9; color:#fff; font-size:15px; }
+  button.active { background:#1fa35b; }
+  button.alt { background:#555; }
+  #status { font-size:13px; color:#9f9; min-height:18px; margin-top:6px; }
+  #debug { color:#0f0; background:#000; font-size:11px; white-space:pre-wrap; max-height:120px; overflow:auto; margin:0; }
+</style>
 </head>
 <body>
-  <div class="container">
-    <h1>🎥 محرر الفيديوهات ومولد المؤثرات (Video Gen)</h1>
-    
-    <!-- منطقة المعاينة واللوحة -->
-    <div class="preview-area">
-      <video id="sourceVideo" style="display:none;" crossorigin="anonymous" playsinline></video>
-      <canvas id="videoCanvas" width="800" height="450"></canvas>
-    </div><pre id="debug" style="color:#0f0;background:#000;font-size:12px;white-space:pre-wrap"></pre>
+<h1>🎥 محرر الفيديوهات ومولد المؤثرات (Video Gen)</h1>
 
-    <!-- شريط التحكم والأدوات -->
-    <div class="controls">
-      <!-- رفع الفيديو -->
-      <div class="upload-section">
-        <input type="file" id="uploadVideo" accept="video/*">
-      </div>
-      
-      <!-- إضافة نص فوق الفيديو -->
-      <div class="text-tools">
-        <input type="text" id="overlayText" placeholder="اكتب نصاً ليظهر فوق الفيديو...">
-        <button id="addTextBtn">إضافة النص</button>
-      </div>
+<div class="box">
+  <input type="file" id="uploadVideo" accept="video/*">
+  <div id="status">اختر فيديو للبدء</div>
+</div>
 
-      <!-- الفلترات والتأثيرات -->
-      <div class="filter-tools">
-        <label>التأثيرات المرئية:</label>
-        <button class="filter-btn" data-filter="none">عادي</button>
-        <button class="filter-btn" data-filter="grayscale(100%)">أبيض وأسود</button>
-        <button class="filter-btn" data-filter="sepia(100%)">سيبيا</button>
-        <button class="filter-btn" data-filter="contrast(150%)">تباين عالٍ</button>
-      </div>
-    </div>
+<div class="box">
+  <canvas id="videoCanvas" width="640" height="360"></canvas>
+  <div class="row">
+    <button id="playBtn" class="alt">⏯ تشغيل / إيقاف</button>
+    <button id="exportBtn">⬇ تصدير الفيديو</button>
   </div>
+</div>
 
-  <!-- تضمين ملفات السكريبت بالترتيب الصحيح -->
-  <script src="coi-serviceworker.js"></script>
-  <script src="canvas-editor.js"></script>
-  <script src="video-generator.js"></script>
-  <script src="youtube-downloader.js"></script>
-  <script src="script.js"></script>
-  <script src="app.js"></script>
-</body>
-</html>
+<div class="box">
+  <input type="text" id="overlayText" placeholder="اكتب النص هنا">
+  <div class="row">
+    <button id="addTextBtn">إضافة النص</button>
+    <button id="clearTextBtn" class="alt">حذف النص</button>
+  </div>
+</div>
+
+<div class="box">
+  <div>التأثيرات المرئية:</div>
+  <div class="row" id="filters">
+    <button data-filter="none" class="active">عادي</button>
+    <button data-filter="grayscale(100%)">أبيض وأسود</button>
+    <button data-filter="sepia(100%)">سيبيا</button>
+    <button data-filter="contrast(180%)">تباين عالٍ</button>
+  </div>
+</div>
+
+<pre id="debug"></pre>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const canvas = $('videoCanvas');
+  const ctx = canvas.getContext('2d');
+  const statusEl = $('status');
+  const dbg = $('debug');
+  const log = m => { dbg.textContent += m + '\n'; dbg.scrollTop = dbg.scrollHeight; };
+  const setStatus = m => { statusEl.textContent = m; };
+
+  window.addEventListener('error', e => log('خطأ JS: ' + e.message + ' (سطر ' + e.lineno + ')'));
+
+  const video = document.createElement('video');
+  video.muted = true;
+  video.playsInline = true;
+  video.setAttribute('playsinline', '');
+  video.preload = 'auto';
+  video.loop = false;
+
+  let currentText = '';
+  let currentFilter = 'none';
+  let recorder = null;
+  let chunks = [];
+  const supportsCtxFilter = 'filter' in ctx;
+  const MAX_W = 720;
+
+  // ===== تحميل الفيديو =====
+  $('uploadVideo').addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (video.src) URL.revokeObjectURL(video.src);
+    setStatus('جاري التحميل: ' + file.name);
+    log('الملف: ' + file.name + ' | ' + file.type + ' | ' + Math.round(file.size/1024) + ' KB');
+    video.src = URL.createObjectURL(file);
+    video.load();
+  });
+
+  video.addEventListener('loadedmetadata', () => {
+    const w = video.videoWidth, h = video.videoHeight;
+    log('الأبعاد: ' + w + 'x' + h);
+    if (!w || !h) { setStatus('تعذر قراءة أبعاد الفيديو'); return; }
+    const scale = Math.min(1, MAX_W / w);
+    canvas.width = Math.round(w * scale);
+    canvas.height = Math.round(h * scale);
+  });
+
+  video.addEventListener('loadeddata', () => {
+    setStatus('تم التحميل ✓');
+    video.play().catch(err => { log('التشغيل: ' + err.message); setStatus('اضغط تشغيل'); });
+  });
+
+  video.addEventListener('playing', () => log('بدأ التشغيل'));
+
+  video.addEventListener('error', () => {
+    const codes = {1:'أُلغي', 2:'شبكة', 3:'فشل فك الترميز', 4:'الصيغة/الترميز غير مدعوم'};
+    const c = video.error ? video.error.code : '?';
+    log('خطأ الفيديو: ' + (codes[c] || c));
+    setStatus('تعذر تشغيل الفيديو. جرّب MP4 بترميز H.264');
+  });
+
+  // ===== تشغيل / إيقاف =====
+  $('playBtn').addEventListener('click', () => {
+    if (!video.src) return;
+    video.paused ? video.play().catch(err => log(err.message)) : video.pause();
+  });
+
+  // ===== النص =====
+  $('addTextBtn').addEventListener('click', () => { currentText = $('overlayText').value; });
+  $('clearTextBtn').addEventListener('click', () => { currentText = ''; $('overlayText').value = ''; });
+
+  // ===== الفلاتر =====
+  $('filters').addEventListener('click', e => {
+    const btn = e.target.closest('button[data-filter]');
+    if (!btn) return;
+    currentFilter = btn.dataset.filter;
+    document.querySelectorAll('#filters button').forEach(b => b.classList.toggle('active', b === btn));
+    if (!supportsCtxFilter) {
+      canvas.style.filter = currentFilter;
+      log('تنبيه: الفلتر للعرض فقط ولن يظهر في التصدير');
+    }
