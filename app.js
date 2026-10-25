@@ -70,3 +70,15 @@ function drawFrame() {
   }
   requestAnimationFrame(drawFrame);
 }
+const dbg = document.getElementById('debug');
+function log(m){ dbg.textContent += m + '\n'; }
+
+window.onerror = (msg, src, line) => log('JS خطأ: ' + msg + ' (سطر ' + line + ')');
+
+video.addEventListener('error', () => {
+  const codes = {1:'أُلغي',2:'شبكة',3:'فشل فك الترميز',4:'الصيغة/الترميز غير مدعوم'};
+  log('خطأ الفيديو: ' + (codes[video.error.code] || video.error.code));
+});
+video.addEventListener('loadedmetadata', () =>
+  log('الأبعاد: ' + video.videoWidth + 'x' + video.videoHeight));
+video.addEventListener('playing', () => log('بدأ التشغيل'));
