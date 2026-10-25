@@ -1,64 +1,71 @@
-// app.js - نسخة محسنة لمنع الشاشة السوداء
-
+// app.js
 const canvas = document.getElementById('videoCanvas');
 const ctx = canvas.getContext('2d');
 const uploadVideo = document.getElementById('uploadVideo');
 const overlayTextInput = document.getElementById('overlayText');
 const addTextBtn = document.getElementById('addTextBtn');
 
-let video = document.createElement('video');
-video.crossOrigin = "anonymous";
-video.muted = true; // كتم الصوت لمنع مشاكل التشغيل التلقائي في المتصفحات
+const video = document.createElement('video');
+video.muted = true;
+video.playsInline = true;      // مهم للجوال
+video.preload = 'auto';
+
 let currentText = '';
 let currentFilter = 'none';
+let loopStarted = false;
 
-// تحميل الفيديو عند اختياره
 uploadVideo.addEventListener('change', (e) => {
   const file = e.target.files[0];
-  if (file) {
-    video.src = URL.createObjectURL(file);
-    video.load();
-    video.onloadeddata = () => {
-      video.play().then(() => {
-        drawFrame();
-      }).catch(err => {
-        console.log("خطأ في تشغيل الفيديو:", err);
-      });
-    };
+  if (!file) return;
+
+  if (video.src) URL.revokeObjectURL(video.src);
+
+  video.onloadedmetadata = () => {
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+  };
+  video.onloadeddata = () => {
+    video.play().catch(err => console.log('خطأ في التشغيل:', err));
+  };
+  video.onerror = () => {
+    alert('تعذر قراءة هذا الفيديو (قد يكون الترميز غير مدعوم). جرّب MP4 بترميز H.264.');
+  };
+
+  video.src = URL.createObjectURL(file);
+  video.load();
+
+  if (!loopStarted) {
+    loopStarted = true;
+    requestAnimationFrame(drawFrame);
   }
 });
 
-// إضافة النص
 addTextBtn.addEventListener('click', () => {
   currentText = overlayTextInput.value;
 });
 
-// تطبيق الفلاتر
 function applyFilter(filterStyle) {
   currentFilter = filterStyle;
+  // بديل يعمل على Safari أيضاً
+  canvas.style.filter = filterStyle;
 }
 
-// رسم الإطارات باستمرار
 function drawFrame() {
-  if (!video.paused && !video.ended) {
-    // تطبيق الفلتر على اللوحة
-    ctx.filter = currentFilter;
+  // نرسم فقط عندما يتوفر إطار فعلي (readyState >= 2)
+  if (video.readyState >= 2) {
+    if ('filter' in ctx) ctx.filter = currentFilter;
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    
-    // إعادة إلغاء الفلتر للنص
-    ctx.filter = 'none';
+    if ('filter' in ctx) ctx.filter = 'none';
 
-    // كتابة النص فوق الفيديو إذا كان موجوداً
     if (currentText) {
-      ctx.font = 'bold 30px Arial';
-      ctx.fillStyle = '#ffffff';
-      ctx.strokeStyle = '#000000';
-      ctx.lineWidth = 2;
+      const size = Math.max(24, Math.round(canvas.height / 15));
+      ctx.font = `bold ${size}px Arial`;
+      ctx.fillStyle = '#fff';
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = size / 12;
       ctx.textAlign = 'center';
-      
-      // رسم النص في أسفل منتصف اللوحة
-      ctx.strokeText(currentText, canvas.width / 2, canvas.height - 40);
-      ctx.fillText(currentText, canvas.width / 2, canvas.height - 40);
+      ctx.strokeText(currentText, canvas.width / 2, canvas.height - size);
+      ctx.fillText(currentText, canvas.width / 2, canvas.height - size);
     }
   }
   requestAnimationFrame(drawFrame);
