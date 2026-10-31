@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>مولد الفيديو من النص</title>
+<title>مولد الفيديو الإسلامي: صورة وصوت ونص</title>
 <style>
   * { box-sizing: border-box; }
   body { margin:0; padding:12px; font-family: Arial, Tahoma, sans-serif; background:#111; color:#fff; }
@@ -12,8 +12,10 @@
   label { display:block; font-size:14px; margin:8px 0 4px; color:#ccc; }
   textarea, select, input[type=number] { width:100%; padding:10px; border-radius:6px; border:1px solid #444; background:#222; color:#fff; font-size:16px; font-family:inherit; }
   input[type=file] { width:100%; color:#ccc; }
-  textarea { min-height:150px; resize:vertical; }
+  textarea { min-height:170px; resize:vertical; }
   .grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .check { display:flex; align-items:center; gap:8px; margin-top:10px; font-size:14px; color:#ccc; }
+  .check input { width:20px; height:20px; }
   canvas { display:block; margin:0 auto; max-width:100%; max-height:65vh; background:#000; border-radius:8px; }
   .row { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
   button { flex:1 1 40%; padding:12px; border:0; border-radius:8px; background:#2d7ff9; color:#fff; font-size:15px; }
@@ -24,16 +26,26 @@
 </style>
 </head>
 <body>
-<h1>🎬 مولد الفيديو من النص</h1>
+<h1>🌙 مولد الفيديو الإسلامي: صورة وصوت ونص</h1>
 
 <div class="box">
-  <label for="story">اكتب نصك (كل سطر أو جملة = شريحة)</label>
-  <textarea id="story">كان يا ما كان في قديم الزمان.
-عاش ولد صغير اسمه أحمد.
-كان يحلم أن يصنع فيديوهات جميلة.
-تعلّم كل يوم شيئًا جديدًا.
-وبعد شهور من التعب، نجح في حلمه!
-شكرًا لمشاهدتكم.</textarea>
+  <label for="story">النص (كل سطر = شريحة. لإضافة مصدر اكتب: النص | المصدر)</label>
+  <textarea id="story">بسم الله الرحمن الرحيم
+ألا بذكر الله تطمئن القلوب | الرعد: 28
+فإن مع العسر يسرًا | الشرح: 5
+وقل ربّ زدني علمًا | طه: 114
+سبحان الله وبحمده، سبحان الله العظيم | متفق عليه
+لا حول ولا قوة إلا بالله</textarea>
+  <p class="note">انسخ الآيات من مصدر موثوق (مثل مجمع الملك فهد لطباعة المصحف) وراجعها حرفًا بحرف.</p>
+
+  <label for="mediaFiles">صور أو فيديوهات مناظر طبيعية (يمكن اختيار عدة ملفات)</label>
+  <input type="file" id="mediaFiles" accept="image/*,video/*" multiple>
+  <div class="row"><button id="clearMedia" class="alt" type="button">إزالة الصور والفيديوهات</button></div>
+
+  <label for="audioFile">ملف الصوت (تأكد من حقوقه)</label>
+  <input type="file" id="audioFile" accept="audio/*">
+  <div class="row"><button id="clearAudio" class="alt" type="button">إزالة الصوت</button></div>
+  <label class="check"><input type="checkbox" id="fitAudio" checked> اجعل مدة الفيديو بطول الصوت</label>
 
   <div class="grid">
     <div>
@@ -45,18 +57,18 @@
       </select>
     </div>
     <div>
-      <label for="theme">الخلفية</label>
+      <label for="theme">لون الخلفية (بدون صور)</label>
       <select id="theme">
-        <option value="0">أزرق</option>
-        <option value="1">بنفسجي</option>
-        <option value="2">أخضر</option>
-        <option value="3">برتقالي داكن</option>
-        <option value="4">أسود</option>
+        <option value="0">أخضر</option>
+        <option value="1">أسود وذهبي</option>
+        <option value="2">أزرق ليلي</option>
+        <option value="3">بنفسجي</option>
+        <option value="4">برتقالي داكن</option>
       </select>
     </div>
     <div>
       <label for="dur">مدة كل شريحة (ثانية)</label>
-      <input type="number" id="dur" value="3" min="1" max="15" step="0.5">
+      <input type="number" id="dur" value="4" min="1" max="60" step="0.5">
     </div>
     <div>
       <label for="fsize">حجم الخط</label>
@@ -67,10 +79,6 @@
       </select>
     </div>
   </div>
-
-  <label for="bgFile">فيديو خلفية (اختياري)</label>
-  <input type="file" id="bgFile" accept="video/*">
-  <div class="row"><button id="removeBg" class="alt" type="button">إزالة فيديو الخلفية</button></div>
 </div>
 
 <div class="box">
@@ -79,8 +87,8 @@
     <button id="playBtn" class="alt" type="button">▶ معاينة</button>
     <button id="exportBtn" type="button">⬇ إنشاء وتنزيل الفيديو</button>
   </div>
-  <div id="status">اضغط معاينة أو إنشاء الفيديو</div>
-  <p class="note">أثناء الإنشاء أبقِ الشاشة مضيئة والصفحة مفتوحة. مدة الإنشاء = مدة الفيديو. الفيديو الناتج بدون صوت.</p>
+  <div id="status">اختر الصور والصوت ثم اضغط معاينة</div>
+  <p class="note">أثناء الإنشاء أبقِ الشاشة مضيئة والصفحة مفتوحة. مدة الإنشاء = مدة الفيديو، ولن تسمع الصوت أثناءه. يفضّل Chrome على أندرويد، والأفضل استخدام صور أو فيديو واحد قصير حتى لا يثقل الجوال.</p>
 </div>
 
 <script>
@@ -90,57 +98,140 @@
   const statusEl = $('status'), playBtn = $('playBtn'), exportBtn = $('exportBtn');
   const setStatus = m => statusEl.textContent = m;
 
+  // [لون1, لون2, لون النص]
   const themes = [
-    ['#1c3b63', '#0b1426'], ['#5b1f6a', '#1a0b2e'], ['#0f5c4d', '#062820'],
-    ['#7a2e12', '#2a0f06'], ['#2a2a2a', '#000000']
+    ['#0f5c4d', '#062820', '#ffffff'],
+    ['#2b2411', '#000000', '#f5d27a'],
+    ['#14284b', '#060c1a', '#ffffff'],
+    ['#5b1f6a', '#1a0b2e', '#ffffff'],
+    ['#7a2e12', '#2a0f06', '#ffffff']
   ];
 
-  // فيديو الخلفية (اختياري)
-  const bg = document.createElement('video');
-  bg.muted = true; bg.loop = true; bg.playsInline = true;
-  bg.setAttribute('playsinline', ''); bg.preload = 'auto';
-  let bgLoaded = false, bgFile = null;
-
-  let slides = [], dur = 3, total = 0;
-  let t = 0, playing = false, startTs = 0;
+  let slides = [], dur = 4, total = 0;
+  let t = 0, playing = false, startTs = 0, syncedIdx = -1;
   let exporting = false, recorder = null;
 
-  // ===== فيديو الخلفية =====
-  const bgInput = $('bgFile');
-  function loadBg(file) {
-    if (!file || file === bgFile) return;
-    bgFile = file;
-    if (bg.src) URL.revokeObjectURL(bg.src);
-    bgLoaded = false;
-    bg.src = URL.createObjectURL(file);
-    bg.load();
-    setStatus('جاري تحميل فيديو الخلفية...');
+  // ===== الصور والفيديوهات =====
+  const media = []; // {type, el, url, ready}
+
+  function clearMedia() {
+    media.forEach(m => {
+      if (m.type === 'vid') { m.el.pause(); m.el.removeAttribute('src'); m.el.load(); }
+      URL.revokeObjectURL(m.url);
+    });
+    media.length = 0;
   }
-  bgInput.addEventListener('click', () => { bgInput.value = ''; bgFile = null; });
-  bgInput.addEventListener('change', () => loadBg(bgInput.files[0]));
-  bgInput.addEventListener('input', () => loadBg(bgInput.files[0]));
-  bg.addEventListener('loadeddata', () => { bgLoaded = true; setStatus('تم تحميل فيديو الخلفية ✓'); });
-  bg.addEventListener('error', () => {
-    bgLoaded = false;
-    setStatus('تعذر تشغيل فيديو الخلفية. جرّب MP4 بترميز H.264');
+
+  function readyMedia() { return media.filter(m => m.ready); }
+
+  function updateMediaStatus() {
+    const n = readyMedia().length;
+    setStatus(n ? 'تم تحميل ' + n + ' من ' + media.length + ' ملف ✓' : 'جاري تحميل الملفات...');
+  }
+
+  $('mediaFiles').addEventListener('change', e => {
+    clearMedia();
+    const files = Array.from(e.target.files || []).slice(0, 12);
+    files.forEach(f => {
+      const url = URL.createObjectURL(f);
+      let item;
+      if (f.type.startsWith('video/')) {
+        const v = document.createElement('video');
+        v.muted = true; v.loop = true; v.playsInline = true;
+        v.setAttribute('playsinline', ''); v.preload = 'auto';
+        item = { type: 'vid', el: v, url, ready: false };
+        v.addEventListener('loadeddata', () => { item.ready = true; updateMediaStatus(); });
+        v.addEventListener('error', () => setStatus('تعذر تشغيل أحد الفيديوهات: ' + f.name));
+        v.src = url; v.load();
+      } else if (f.type.startsWith('image/')) {
+        const img = new Image();
+        item = { type: 'img', el: img, url, ready: false };
+        img.onload = () => { item.ready = true; updateMediaStatus(); };
+        img.onerror = () => setStatus('تعذر قراءة الصورة: ' + f.name);
+        img.src = url;
+      } else { URL.revokeObjectURL(url); return; }
+      media.push(item);
+    });
+    if (files.length) setStatus('جاري تحميل الملفات...');
   });
-  $('removeBg').addEventListener('click', () => {
-    if (bg.src) URL.revokeObjectURL(bg.src);
-    bg.removeAttribute('src'); bg.load();
-    bgLoaded = false; bgFile = null; bgInput.value = '';
-    setStatus('تمت إزالة فيديو الخلفية');
+
+  $('clearMedia').addEventListener('click', () => {
+    clearMedia(); $('mediaFiles').value = '';
+    setStatus('تمت إزالة الصور والفيديوهات');
   });
+
+  // ===== الصوت =====
+  const aud = new Audio();
+  aud.preload = 'auto';
+  aud.loop = true;
+  let audLoaded = false, audUrl = null;
+  let audCtx = null, audGain = null, speakerGain = null, audDest = null;
+
+  $('audioFile').addEventListener('change', e => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    if (audUrl) URL.revokeObjectURL(audUrl);
+    audLoaded = false;
+    audUrl = URL.createObjectURL(f);
+    aud.src = audUrl;
+    aud.load();
+    setStatus('جاري تحميل الصوت...');
+  });
+  aud.addEventListener('loadedmetadata', () => {
+    audLoaded = true;
+    const d = isFinite(aud.duration) ? Math.round(aud.duration) + ' ثانية' : '';
+    setStatus('تم تحميل الصوت ✓ ' + d);
+    refresh();
+  });
+  aud.addEventListener('error', () => { audLoaded = false; setStatus('تعذر تشغيل ملف الصوت. جرّب MP3 أو M4A'); });
+
+  $('clearAudio').addEventListener('click', () => {
+    aud.pause();
+    if (audUrl) URL.revokeObjectURL(audUrl);
+    audUrl = null; audLoaded = false;
+    aud.removeAttribute('src'); aud.load();
+    $('audioFile').value = '';
+    refresh();
+    setStatus('تمت إزالة الصوت');
+  });
+
+  function ensureAudioGraph() {
+    if (audCtx) { if (audCtx.state === 'suspended') audCtx.resume(); return true; }
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      audCtx = new AC();
+      const src = audCtx.createMediaElementSource(aud);
+      audGain = audCtx.createGain();
+      speakerGain = audCtx.createGain();
+      audDest = audCtx.createMediaStreamDestination();
+      src.connect(audGain);
+      audGain.connect(audDest);
+      audGain.connect(speakerGain);
+      speakerGain.connect(audCtx.destination);
+      if (audCtx.state === 'suspended') audCtx.resume();
+      return true;
+    } catch (_) { audCtx = null; return false; }
+  }
+
+  function setFade(v) {
+    if (audGain) audGain.gain.value = v; else aud.volume = v;
+  }
 
   // ===== تقسيم النص إلى شرائح =====
   function parseSlides() {
-    const text = $('story').value.trim();
-    if (!text) return [];
     const out = [];
-    text.split(/\n+/).forEach(line => {
+    $('story').value.split(/\n+/).forEach(line => {
       line = line.trim();
       if (!line) return;
-      const parts = line.match(/[^.!?؟۔]+[.!?؟۔]*/g) || [line];
-      parts.forEach(p => { p = p.trim(); if (p) out.push(p); });
+      if (line.includes('|')) {
+        const parts = line.split('|');
+        const main = parts.shift().trim();
+        const sub = parts.join('|').trim();
+        if (main) out.push({ text: main, sub });
+        return;
+      }
+      const ps = line.match(/[^.!?؟۔]+[.!?؟۔]*/g) || [line];
+      ps.forEach(p => { p = p.trim(); if (p) out.push({ text: p, sub: '' }); });
     });
     return out;
   }
@@ -149,7 +240,11 @@
     const [w, h] = $('size').value.split('x').map(Number);
     if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
     slides = parseSlides();
-    dur = Math.min(15, Math.max(1, parseFloat($('dur').value) || 3));
+    let d = parseFloat($('dur').value) || 4;
+    if ($('fitAudio').checked && audLoaded && isFinite(aud.duration) && slides.length) {
+      d = aud.duration / slides.length;
+    }
+    dur = Math.min(60, Math.max(1, d));
     total = slides.length * dur;
   }
 
@@ -167,27 +262,52 @@
   }
 
   // ===== الرسم =====
-  function drawBackground() {
+  function drawItem(it, localT, alpha) {
+    const W = cv.width, H = cv.height, el = it.el;
+    const sw = it.type === 'img' ? el.naturalWidth : el.videoWidth;
+    const sh = it.type === 'img' ? el.naturalHeight : el.videoHeight;
+    if (!sw || !sh) return;
+    if (it.type === 'vid' && el.readyState < 2) return;
+    let s = Math.max(W / sw, H / sh);
+    if (it.type === 'img') s *= 1 + 0.12 * Math.min(1, localT / dur); // تقريب بطيء
+    const dw = sw * s, dh = sh * s;
+    ctx.globalAlpha = alpha;
+    ctx.drawImage(el, (W - dw) / 2, (H - dh) / 2, dw, dh);
+    ctx.globalAlpha = 1;
+  }
+
+  function drawBackground(idx, local) {
     const W = cv.width, H = cv.height;
-    if (bgLoaded && bg.readyState >= 2 && bg.videoWidth) {
-      const s = Math.max(W / bg.videoWidth, H / bg.videoHeight);
-      const dw = bg.videoWidth * s, dh = bg.videoHeight * s;
-      ctx.drawImage(bg, (W - dw) / 2, (H - dh) / 2, dw, dh);
-      ctx.fillStyle = 'rgba(0,0,0,0.4)';
-      ctx.fillRect(0, 0, W, H);
+    const th = themes[+$('theme').value];
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, th[0]); g.addColorStop(1, th[1]);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+
+    const rm = readyMedia();
+    if (!rm.length) return;
+    const cur = rm[idx % rm.length];
+    const fade = 0.6;
+    if (idx > 0 && rm.length > 1 && local < fade) {
+      drawItem(rm[(idx - 1) % rm.length], dur + local, 1);
+      drawItem(cur, local, local / fade);
     } else {
-      const [c1, c2] = themes[+$('theme').value];
-      const g = ctx.createLinearGradient(0, 0, 0, H);
-      g.addColorStop(0, c1); g.addColorStop(1, c2);
-      ctx.fillStyle = g;
-      ctx.fillRect(0, 0, W, H);
+      drawItem(cur, local, 1);
     }
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  function slideIndex(time) {
+    return slides.length ? Math.min(slides.length - 1, Math.floor(time / dur)) : 0;
   }
 
   function render(time) {
     const W = cv.width, H = cv.height;
-    ctx.globalAlpha = 1;
-    drawBackground();
+    const idx = slideIndex(time);
+    const local = time - idx * dur;
+    drawBackground(idx, local);
 
     if (!slides.length) {
       ctx.fillStyle = '#fff';
@@ -197,49 +317,65 @@
       return;
     }
 
-    const idx = Math.min(slides.length - 1, Math.floor(time / dur));
-    const local = time - idx * dur;
+    const th = themes[+$('theme').value];
     const fadeIn = Math.min(1, local / 0.5);
     const fadeOut = Math.min(1, (dur - local) / 0.4);
     const alpha = Math.max(0, Math.min(fadeIn, fadeOut));
     const scale = 0.96 + 0.04 * Math.min(1, local / dur);
 
-    const txt = slides[idx];
+    const s = slides[idx];
     const base = (W >= H ? W / 20 : W / 13) * parseFloat($('fsize').value);
     ctx.save();
     ctx.globalAlpha = alpha;
     ctx.translate(W / 2, H / 2);
     ctx.scale(scale, scale);
     ctx.font = 'bold ' + Math.round(base) + 'px Arial, Tahoma, sans-serif';
-    ctx.direction = /[\u0600-\u06FF]/.test(txt) ? 'rtl' : 'ltr';
+    ctx.direction = /[\u0600-\u06FF]/.test(s.text) ? 'rtl' : 'ltr';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.shadowColor = 'rgba(0,0,0,.6)';
-    ctx.shadowBlur = 12;
-    ctx.fillStyle = '#fff';
-    const lines = wrap(txt, W * 0.8);
+    ctx.shadowColor = 'rgba(0,0,0,.7)';
+    ctx.shadowBlur = 14;
+    ctx.fillStyle = th[2];
+    const lines = wrap(s.text, W * 0.8);
     const lh = base * 1.5;
     const y0 = -((lines.length - 1) * lh) / 2;
     lines.forEach((l, i) => ctx.fillText(l, 0, y0 + i * lh));
+    if (s.sub) {
+      ctx.font = Math.round(base * 0.55) + 'px Arial, Tahoma, sans-serif';
+      ctx.fillStyle = '#f5d27a';
+      ctx.fillText(s.sub, 0, y0 + (lines.length - 1) * lh + base * 1.3);
+    }
     ctx.restore();
 
-    // شريط التقدم + رقم الشريحة
+    // شريط التقدم
     ctx.globalAlpha = 1;
     ctx.fillStyle = 'rgba(255,255,255,.25)';
     ctx.fillRect(0, H - 8, W, 8);
-    ctx.fillStyle = '#4da3ff';
+    ctx.fillStyle = '#f5d27a';
     ctx.fillRect(0, H - 8, W * Math.min(1, time / total), 8);
-    ctx.direction = 'ltr';
-    ctx.font = Math.round(W / 36) + 'px Arial';
-    ctx.fillStyle = 'rgba(255,255,255,.7)';
-    ctx.textAlign = 'center';
-    ctx.fillText((idx + 1) + ' / ' + slides.length, W / 2, H - 28);
+  }
+
+  // ===== تشغيل فيديوهات الخلفية =====
+  function syncVideos(idx) {
+    const rm = readyMedia();
+    if (!rm.length) return;
+    const cur = rm[idx % rm.length];
+    const prev = idx > 0 ? rm[(idx - 1) % rm.length] : null;
+    rm.forEach(m => {
+      if (m.type !== 'vid') return;
+      if (m === cur || m === prev) {
+        if (m === cur && rm.length > 1) m.el.currentTime = 0;
+        if (m.el.paused) m.el.play().catch(() => {});
+      } else if (!m.el.paused) m.el.pause();
+    });
   }
 
   function stopPlayback() {
     playing = false;
     playBtn.textContent = '▶ معاينة';
-    if (bgLoaded) bg.pause();
+    media.forEach(m => { if (m.type === 'vid') m.el.pause(); });
+    aud.pause();
+    setFade(1);
   }
 
   function loop(now) {
@@ -251,8 +387,11 @@
         if (exporting && recorder && recorder.state !== 'inactive') {
           setTimeout(() => { if (recorder && recorder.state !== 'inactive') recorder.stop(); }, 300);
         } else setStatus('انتهت المعاينة');
-      } else if (exporting) {
-        setStatus('جاري إنشاء الفيديو... ' + Math.round(t / total * 100) + '%');
+      } else {
+        setFade(Math.max(0, Math.min(1, (total - t) / 1.5)));
+        const idx = slideIndex(t);
+        if (idx !== syncedIdx) { syncedIdx = idx; syncVideos(idx); }
+        if (exporting) setStatus('جاري إنشاء الفيديو... ' + Math.round(t / total * 100) + '%');
       }
     }
     render(t);
@@ -262,9 +401,15 @@
   function start() {
     refresh();
     if (!slides.length) { setStatus('اكتب نصًا أولًا'); return false; }
-    t = 0; startTs = performance.now(); playing = true;
+    t = 0; startTs = performance.now(); playing = true; syncedIdx = -1;
     playBtn.textContent = '⏹ إيقاف';
-    if (bgLoaded) { bg.currentTime = 0; bg.play().catch(() => {}); }
+    if (audLoaded) {
+      ensureAudioGraph();
+      if (speakerGain) speakerGain.gain.value = exporting ? 0 : 1;
+      setFade(1);
+      aud.currentTime = 0;
+      aud.play().catch(err => setStatus('تعذر تشغيل الصوت: ' + err.message));
+    }
     return true;
   }
 
@@ -274,12 +419,17 @@
     if (start()) setStatus('جاري المعاينة...');
   });
 
-  ['size', 'theme', 'fsize', 'dur', 'story'].forEach(id =>
-    $(id).addEventListener('input', () => { refresh(); if (!playing) t = 0; }));
+  ['size', 'theme', 'fsize', 'dur', 'story', 'fitAudio'].forEach(id => {
+    $(id).addEventListener('input', () => { refresh(); if (!playing) t = 0; });
+    $(id).addEventListener('change', () => { refresh(); if (!playing) t = 0; });
+  });
 
   // ===== التصدير =====
   function pickMime() {
-    const list = ['video/mp4;codecs=avc1.42E01E', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'];
+    const list = [
+      'video/mp4;codecs=avc1.42E01E,mp4a.40.2', 'video/mp4',
+      'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'
+    ];
     return list.find(m => window.MediaRecorder && MediaRecorder.isTypeSupported(m)) || '';
   }
 
@@ -292,10 +442,17 @@
     refresh();
     if (!slides.length) { setStatus('اكتب نصًا أولًا'); return; }
 
+    const stream = cv.captureStream(30);
+    if (audLoaded && ensureAudioGraph() && audDest) {
+      audDest.stream.getAudioTracks().forEach(tr => stream.addTrack(tr));
+    } else if (audLoaded) {
+      setStatus('الصوت غير مدعوم للتصدير في هذا المتصفح، سيُنشأ الفيديو بدونه');
+    }
+
     const mime = pickMime();
     const chunks = [];
     try {
-      recorder = new MediaRecorder(cv.captureStream(30),
+      recorder = new MediaRecorder(stream,
         mime ? { mimeType: mime, videoBitsPerSecond: 4000000 } : undefined);
     } catch (e) { setStatus('تعذر بدء التصدير'); return; }
 
@@ -310,7 +467,7 @@
       if (!blob.size) { setStatus('فشل الإنشاء: الملف فارغ'); return; }
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = url; a.download = 'story-video.' + ext;
+      a.href = url; a.download = 'islamic-video.' + ext;
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 60000);
       setStatus('تم إنشاء الفيديو ✓ (' + ext + ')');
