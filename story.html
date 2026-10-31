@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>مولد الفيديو من النص</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin:0; padding:12px; font-family: Arial, Tahoma, sans-serif; background:#111; color:#fff; }
+  h1 { font-size:18px; text-align:center; margin:0 0 12px; }
+  .box { background:#1c1c1c; border-radius:10px; padding:10px; margin-bottom:10px; }
+  label { display:block; font-size:14px; margin:8px 0 4px; color:#ccc; }
+  textarea, select, input[type=number] { width:100%; padding:10px; border-radius:6px; border:1px solid #444; background:#222; color:#fff; font-size:16px; font-family:inherit; }
+  input[type=file] { width:100%; color:#ccc; }
+  textarea { min-height:150px; resize:vertical; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  canvas { display:block; margin:0 auto; max-width:100%; max-height:65vh; background:#000; border-radius:8px; }
+  .row { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+  button { flex:1 1 40%; padding:12px; border:0; border-radius:8px; background:#2d7ff9; color:#fff; font-size:15px; }
+  button.alt { background:#555; }
+  button:disabled { opacity:.5; }
+  #status { font-size:13px; color:#9f9; min-height:18px; margin-top:8px; text-align:center; }
+  .note { font-size:12px; color:#aaa; margin:6px 0 0; }
+</style>
+</head>
+<body>
+<h1>🎬 مولد الفيديو من النص</h1>
+
+<div class="box">
+  <label for="story">اكتب نصك (كل سطر أو جملة = شريحة)</label>
+  <textarea id="story">كان يا ما كان في قديم الزمان.
+عاش ولد صغير اسمه أحمد.
+كان يحلم أن يصنع فيديوهات جميلة.
+تعلّم كل يوم شيئًا جديدًا.
+وبعد شهور من التعب، نجح في حلمه!
+شكرًا لمشاهدتكم.</textarea>
+
+  <div class="grid">
+    <div>
+      <label for="size">شكل الفيديو</label>
+      <select id="size">
+        <option value="720x1280">طولي (ريلز / ستوري)</option>
+        <option value="1280x720">عرضي (يوتيوب)</option>
+        <option value="720x720">مربع</option>
+      </select>
+    </div>
+    <div>
+      <label for="theme">الخلفية</label>
+      <select id="theme">
+        <option value="0">أزرق</option>
+        <option value="1">بنفسجي</option>
+        <option value="2">أخضر</option>
+        <option value="3">برتقالي داكن</option>
+        <option value="4">أسود</option>
+      </select>
+    </div>
+    <div>
+      <label for="dur">مدة كل شريحة (ثانية)</label>
+      <input type="number" id="dur" value="3" min="1" max="15" step="0.5">
+    </div>
+    <div>
+      <label for="fsize">حجم الخط</label>
+      <select id="fsize">
+        <option value="0.8">صغير</option>
+        <option value="1" selected>متوسط</option>
+        <option value="1.25">كبير</option>
+      </select>
+    </div>
+  </div>
+
+  <label for="bgFile">فيديو خلفية (اختياري)</label>
+  <input type="file" id="bgFile" accept="video/*">
+  <div class="row"><button id="removeBg" class="alt" type="button">إزالة فيديو الخلفية</button></div>
+</div>
+
+<div class="box">
+  <canvas id="cv" width="720" height="1280"></canvas>
+  <div class="row">
+    <button id="playBtn" class="alt" type="button">▶ معاينة</button>
+    <button id="exportBtn" type="button">⬇ إنشاء وتنزيل الفيديو</button>
+  </div>
+  <div id="status">اضغط معاينة أو إنشاء الفيديو</div>
+  <p class="note">أثناء الإنشاء أبقِ الشاشة مضيئة والصفحة مفتوحة. مدة الإنشاء = مدة الفيديو. الفيديو الناتج بدون صوت.</p>
+</div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const cv = $('cv'), ctx = cv.getContext('2d');
+  const statusEl = $('status'), playBtn = $('playBtn'), exportBtn = $('exportBtn');
+  const setStatus = m => statusEl.textContent = m;
+
+  const themes = [
+    ['#1c3b63', '#0b1426'], ['#5b1f6a', '#1a0b2e'], ['#0f5c4d', '#062820'],
+    ['#7a2e12', '#2a0f06'], ['#2a2a2a', '#000000']
+  ];
+
+  // فيديو الخلفية (اختياري)
+  const bg = document.createElement('video');
+  bg.muted = true; bg.loop = true; bg.playsInline = true;
+  bg.setAttribute('playsinline', ''); bg.preload = 'auto';
+  let bgLoaded = false, bgFile = null;
+
+  let slides = [], dur = 3, total = 0;
+  let t = 0, playing = false, startTs = 0;
+  let exporting = false, recorder = null;
+
+  // ===== فيديو الخلفية =====
+  const bgInput = $('bgFile');
+  function loadBg(file) {
+    if (!file || file === bgFile) return;
+    bgFile = file;
+    if (bg.src) URL.revokeObjectURL(bg.src);
+    bgLoaded = false;
+    bg.src = URL.createObjectURL(file);
+    bg.load();
+    setStatus('جاري تحميل فيديو الخلفية...');
+  }
+  bgInput.addEventListener('click', () => { bgInput.value = ''; bgFile = null; });
+  bgInput.addEventListener('change', () => loadBg(bgInput.files[0]));
+  bgInput.addEventListener('input', () => loadBg(bgInput.files[0]));
+  bg.addEventListener('loadeddata', () => { bgLoaded = true; setStatus('تم تحميل فيديو الخلفية ✓'); });
+  bg.addEventListener('error', () => {
+    bgLoaded = false;
+    setStatus('تعذر تشغيل فيديو الخلفية. جرّب MP4 بترميز H.264');
+  });
+  $('removeBg').addEventListener('click', () => {
+    if (bg.src) URL.revokeObjectURL(bg.src);
+    bg.removeAttribute('src'); bg.load();
+    bgLoaded = false; bgFile = null; bgInput.value = '';
+    setStatus('تمت إزالة فيديو الخلفية');
+  });
+
+  // ===== تقسيم النص إلى شرائح =====
+  function parseSlides() {
+    const text = $('story').value.trim();
+    if (!text) return [];
+    const out = [];
+    text.split(/\n+/).forEach(line => {
+      line = line.trim();
+      if (!line) return;
+      const parts = line.match(/[^.!?؟۔]+[.!?؟۔]*/g) || [line];
+      parts.forEach(p => { p = p.trim(); if (p) out.push(p); });
+    });
+    return out;
+  }
+
+  function refresh() {
+    const [w, h] = $('size').value.split('x').map(Number);
+    if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
+    slides = parseSlides();
+    dur = Math.min(15, Math.max(1, parseFloat($('dur').value) || 3));
+    total = slides.length * dur;
+  }
+
+  function wrap(text, maxW) {
+    const words = text.split(/\s+/).filter(Boolean);
+    const lines = [];
+    let line = '';
+    for (const w of words) {
+      const test = line ? line + ' ' + w : w;
+      if (ctx.measureText(test).width > maxW && line) { lines.push(line); line = w; }
+      else line = test;
+    }
+    if (line) lines.push(line);
+    return lines;
+  }
+
+  // ===== الرسم =====
+  function drawBackground() {
+    const W = cv.width, H = cv.height;
+    if (bgLoaded && bg.readyState >= 2 && bg.videoWidth) {
+      const s = Math.max(W / bg.videoWidth, H / bg.videoHeight);
+      const dw = bg.videoWidth * s, dh = bg.videoHeight * s;
+      ctx.drawImage(bg, (W - dw) / 2, (H - dh) / 2, dw, dh);
+      ctx.fillStyle = 'rgba(0,0,0,0.4)';
+      ctx.fillRect(0, 0, W, H);
+    } else {
+      const [c1, c2] = themes[+$('theme').value];
+      const g = ctx.createLinearGradient(0, 0, 0, H);
+      g.addColorStop(0, c1); g.addColorStop(1, c2);
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, W, H);
+    }
+  }
+
+  function render(time) {
+    const W = cv.width, H = cv.height;
+    ctx.globalAlpha = 1;
+    drawBackground();
+
+    if (!slides.length) {
+      ctx.fillStyle = '#fff';
+      ctx.textAlign = 'center';
+      ctx.font = 'bold ' + Math.round(W / 16) + 'px Arial, Tahoma, sans-serif';
+      ctx.fillText('اكتب نصك لبدء الفيديو', W / 2, H / 2);
+      return;
+    }
+
+    const idx = Math.min(slides.length - 1, Math.floor(time / dur));
+    const local = time - idx * dur;
+    const fadeIn = Math.min(1, local / 0.5);
+    const fadeOut = Math.min(1, (dur - local) / 0.4);
+    const alpha = Math.max(0, Math.min(fadeIn, fadeOut));
+    const scale = 0.96 + 0.04 * Math.min(1, local / dur);
+
+    const txt = slides[idx];
+    const base = (W >= H ? W / 20 : W / 13) * parseFloat($('fsize').value);
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.translate(W / 2, H / 2);
+    ctx.scale(scale, scale);
+    ctx.font = 'bold ' + Math.round(base) + 'px Arial, Tahoma, sans-serif';
+    ctx.direction = /[\u0600-\u06FF]/.test(txt) ? 'rtl' : 'ltr';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = 'rgba(0,0,0,.6)';
+    ctx.shadowBlur = 12;
+    ctx.fillStyle = '#fff';
+    const lines = wrap(txt, W * 0.8);
+    const lh = base * 1.5;
+    const y0 = -((lines.length - 1) * lh) / 2;
+    lines.forEach((l, i) => ctx.fillText(l, 0, y0 + i * lh));
+    ctx.restore();
+
+    // شريط التقدم + رقم الشريحة
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = 'rgba(255,255,255,.25)';
+    ctx.fillRect(0, H - 8, W, 8);
+    ctx.fillStyle = '#4da3ff';
+    ctx.fillRect(0, H - 8, W * Math.min(1, time / total), 8);
+    ctx.direction = 'ltr';
+    ctx.font = Math.round(W / 36) + 'px Arial';
+    ctx.fillStyle = 'rgba(255,255,255,.7)';
+    ctx.textAlign = 'center';
+    ctx.fillText((idx + 1) + ' / ' + slides.length, W / 2, H - 28);
+  }
+
+  function stopPlayback() {
+    playing = false;
+    playBtn.textContent = '▶ معاينة';
+    if (bgLoaded) bg.pause();
+  }
+
+  function loop(now) {
+    if (playing) {
+      t = (now - startTs) / 1000;
+      if (t >= total) {
+        t = Math.max(0, total - 0.01);
+        stopPlayback();
+        if (exporting && recorder && recorder.state !== 'inactive') {
+          setTimeout(() => { if (recorder && recorder.state !== 'inactive') recorder.stop(); }, 300);
+        } else setStatus('انتهت المعاينة');
+      } else if (exporting) {
+        setStatus('جاري إنشاء الفيديو... ' + Math.round(t / total * 100) + '%');
+      }
+    }
+    render(t);
+    requestAnimationFrame(loop);
+  }
+
+  function start() {
+    refresh();
+    if (!slides.length) { setStatus('اكتب نصًا أولًا'); return false; }
+    t = 0; startTs = performance.now(); playing = true;
+    playBtn.textContent = '⏹ إيقاف';
+    if (bgLoaded) { bg.currentTime = 0; bg.play().catch(() => {}); }
+    return true;
+  }
+
+  playBtn.addEventListener('click', () => {
+    if (exporting) return;
+    if (playing) { stopPlayback(); return; }
+    if (start()) setStatus('جاري المعاينة...');
+  });
+
+  ['size', 'theme', 'fsize', 'dur', 'story'].forEach(id =>
+    $(id).addEventListener('input', () => { refresh(); if (!playing) t = 0; }));
+
+  // ===== التصدير =====
+  function pickMime() {
+    const list = ['video/mp4;codecs=avc1.42E01E', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'];
+    return list.find(m => window.MediaRecorder && MediaRecorder.isTypeSupported(m)) || '';
+  }
+
+  exportBtn.addEventListener('click', () => {
+    if (exporting) return;
+    if (!window.MediaRecorder || !cv.captureStream) {
+      setStatus('هذا المتصفح لا يدعم التصدير. جرّب Chrome');
+      return;
+    }
+    refresh();
+    if (!slides.length) { setStatus('اكتب نصًا أولًا'); return; }
+
+    const mime = pickMime();
+    const chunks = [];
+    try {
+      recorder = new MediaRecorder(cv.captureStream(30),
+        mime ? { mimeType: mime, videoBitsPerSecond: 4000000 } : undefined);
+    } catch (e) { setStatus('تعذر بدء التصدير'); return; }
+
+    exporting = true;
+    exportBtn.disabled = true;
+    recorder.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+    recorder.onstop = () => {
+      const type = (recorder && recorder.mimeType) || mime || 'video/webm';
+      const ext = type.includes('mp4') ? 'mp4' : 'webm';
+      const blob = new Blob(chunks, { type });
+      exporting = false; recorder = null; exportBtn.disabled = false;
+      if (!blob.size) { setStatus('فشل الإنشاء: الملف فارغ'); return; }
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'story-video.' + ext;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+      setStatus('تم إنشاء الفيديو ✓ (' + ext + ')');
+    };
+    recorder.start(500);
+    start();
+  });
+
+  refresh();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
